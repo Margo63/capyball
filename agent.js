@@ -25,7 +25,7 @@ class Agent {
 
     }
     msgGot(msg) { // Получение сообщения
-        console.log("2 msgGot"+msg)
+        //console.log("2 msgGot"+msg)
         let data = msg.toString('utf8') // ПРиведение к строке
         this.processMsg(data) // Разбор сообщения
         this.sendCmd() // Отправка команды
@@ -36,11 +36,11 @@ class Agent {
 
     }
     socketSend(cmd, value) {// Отправка команды
-        console.log("1 send msg: "+`(${cmd} ${value})`)
+        //console.log("1 send msg: "+`(${cmd} ${value})`)
         this.socket.sendMsg(`(${cmd} ${value})`)
     }
     processMsg(msg) { // Обработка сообщения
-        console.log("3 processMsg:"+msg)
+        //console.log("3 processMsg:"+msg)
         let data = Msg.parseMsg(msg) // Разбор сообщения
         if(!data) throw new Error("Parse error\n" + msg)
         // Первое (hear) — начало игры
@@ -53,7 +53,8 @@ class Agent {
         if(p[1]) this.id = p[1] // id игрока
     }
     analyzeEnv(msg, cmd, p){// Анализ сообщения
-        console.log("4 get message"+msg)
+        //console.log("4 get message"+msg)
+
     }
     sendCmd() {
         if (this.run) { // Идра начата
