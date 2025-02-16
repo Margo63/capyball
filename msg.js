@@ -1,7 +1,7 @@
 module.exports = {
     parseMsg(msg) { // Разбор сообщения
         if (msg.endsWith("\u0000")) // Удаление символа в конце
-            msg = msg.substring(0, msg.length - "\uOOOO".length)
+            msg = msg.substring(0, msg.length - "\u0000".length)
         // Разбор сообщения
         let array = msg.match(/(\(|[-\d\.]+|[\\\"\w]+|\))/g)
         let res = {msg, p: []} // Результирующее сообщение
