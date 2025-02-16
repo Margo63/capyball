@@ -37,7 +37,7 @@ module.exports = {
         index.idx++
     },
     makeCmd(res) { // Выделение команды
-        if (res.p && res.p.length > О) {
+        if (res.p && res.p.length > 0) {
             // Первый параметр — команда
             res.cmd = res.p.shift()
             // Выделить команды у параметров

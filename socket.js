@@ -1,5 +1,6 @@
 const dgram = require('dgram')
 module.exports = function(agent, teamName, version){
+    //console.log(agent+teamName+version)
     //create socket
     const socket = dgram.createSocket({type:'udp4',reuseAddr:true})
     agent.setSocket(socket) //set socket via agent
@@ -7,8 +8,10 @@ module.exports = function(agent, teamName, version){
         agent.msgGot(msg) // Обработка полученного сообщения
     })
     socket.sendMsg = function (msg){// Отправка сообщения серверу
+
         socket.send(Buffer.from(msg), 6000, 'localhost', (err,bytes) =>{
             if(err) throw err
+            else console.log("ok")
         })
     }
     // ИНициализация игрока на сервере(без параметра goalie)
