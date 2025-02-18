@@ -53,10 +53,12 @@ class Agent {
                     if ("d" == input) this.act = {n: "turn", v: 20}
                     if ("a" == input) this.act = {n: "turn", v: -20}
                     if ("s" == input) this.act = {n: "kick", v: 100}
+
                 }else{
                     const data = input.split(" ")
                     if(data.length == 3){
                         this.socketSend("move",data[0]+" "+data[1])
+                        //this.act = {n: "turn", v: parseInt(data[2])}
                         this.speed = parseInt(data[2])
                     }
 
@@ -97,6 +99,7 @@ class Agent {
     }
     analyzeEnv(msg, cmd, p){// Анализ сообщения
         //console.log("4 get message"+cmd)
+
         switch(cmd){
             case "see":
 
@@ -112,6 +115,7 @@ class Agent {
         }
 
 
+
     }
     sendCmd() {
         if (this.run) { // Идра начата
@@ -122,8 +126,10 @@ class Agent {
                     this.socketSend(this.act.n, this.act.v)
             }
             this.act = null // reset comand
+            this.socketSend("turn",`${this.speed}`) //every time turn after game start
         }
     }
+
 }
 
 module.exports = Agent //hero export
