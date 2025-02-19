@@ -5,7 +5,7 @@ const Flags = {
     ftl50: {x: -50, y: 39}, ftl40: {x: -40, y: 39},
     ftl30: {x: -30, y: 39}, ftl20: {x: -20, y: 39},
     ftl10: {x: -10, y: 39}, ft0: {x: 0, y: 39},
-    ftr10: {x: 10, y: 39}, ft20: {x: 20, y: 39},
+    ftr10: {x: 10, y: 39}, ftr20: {x: 20, y: 39},
     ftr30: {x: 30, y: 39}, ftr40: {x: 40, y: 39},
     ftr50: {x: 50, y: 39}, fbl50: {x: -50, y: -39},
     fbl40: {x: -40, y: -39}, fbl30: {x: -30, y: -39},
@@ -102,6 +102,10 @@ class Agent {
 
         switch(cmd){
             case "see":
+                if(this.run){
+                    console.log(this.getCoord(p))
+
+                }
 
                 break;
             case "hear":
@@ -129,6 +133,58 @@ class Agent {
             this.socketSend("turn",`${this.speed}`) //every time turn after game start
         }
     }
+
+    getCoord(p){
+
+
+        let list_x =[]
+        let list_y =[]
+        let list_distance =[]
+        for (let i = 1; i< p.length; i++) {
+            const flag = p[i].cmd.p.join("")
+            if (Flags[flag] === undefined) {
+                console.log(flag)
+                continue
+            }
+            if(!(Flags[flag].x in list_x)){
+                list_x.push(Flags[flag].x)
+                list_y.push(Flags[flag].y)
+                list_distance.push(p[i].p[0])
+            }
+
+            if(list_x.length === 3) break;
+        }
+        if(list_x.length!==3) return {x: 0, y: 0};
+
+        const a1 = (list_y[0] - list_y[1])/(list_x[1]-list_x[0])
+        const a2 = (list_y[0] - list_y[2])/(list_x[2]-list_x[0])
+
+        const b1 = (list_y[1]**2 - list_y[0]**2 + list_x[1]**2 - list_x[0]**2 + list_distance[0]**2 - list_distance[1]**2)/(2*(list_x[1]-list_x[0]))
+        const b2 = (list_y[2]**2 - list_y[0]**2 + list_x[2]**2 - list_x[0]**2 + list_distance[0]**2 - list_distance[2]**2)/(2*(list_x[2]-list_x[0]))
+
+        // let A = []
+        // let b = []
+        // const x1 = Flags[p[1].cmd.p.join("")].x
+        // const y1 = Flags[p[1].cmd.p.join("")].y
+        // const d1 = p[1].p[0]
+        //
+        // for (let i = 2; i< p.length; i++){
+        //     const flag = p[i].cmd.p.join("")
+        //     if (Flags[flag]===undefined){
+        //         console.log(flag)
+        //         continue
+        //     }
+        //     const xi = Flags[flag].x
+        //     const yi = Flags[flag].y
+        //     const di = p[1].p[0]
+        //     A.push([2*(xi-x1),2*(yi-y1)])
+        //     b.push(d1**2 - di**2 + xi**2 - x1**2 + yi**2 - y1**2)
+        //     //console.log(`${p[i].p}: ${p[i].cmd.p.join("")}`)
+        // }
+        // console.log([A,b])
+        return {x: a1*((b1-b2)/(a2-a1))+b1, y: (b1-b2)/(a2-a1)}
+    }
+
 
 }
 
