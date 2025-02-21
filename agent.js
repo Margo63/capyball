@@ -103,10 +103,14 @@ class Agent {
         switch(cmd){
             case "see":
                 if(this.run){
-                    //console.log(this.getCoordinatesAgent(p))
+                    const coord = this.getCoordinatesAgent(p)
+                    console.log(coord)
                     for(let i = 1; i<p.length;i++){
-                        if(p[i].cmd.p[0]==="p")
-                            this.getEnemyCoordinates(p, p[i].cmd)
+                        if(p[i].cmd.p[0]==="p"){
+                            const enemy = this.getEnemyCoordinates(p, p[i],coord)
+                            console.log(`enemy: ${enemy.x} ${enemy.y}`)
+                        }
+
 
                     }
                 }
@@ -221,9 +225,36 @@ class Agent {
 
     }
 
-    getEnemyCoordinates(p,enemy_p){
-        console.log(enemy_p)
-        return {x:0,y:0}
+    getEnemyCoordinates(p,enemy_p, coord){
+        let x
+        let y
+        let distance
+        for (let i = 1; i< p.length; i++) {
+            const flag = p[i].cmd.p.join("")
+            if (Flags[flag] === undefined) {
+                console.log(flag)
+                continue
+            }
+            x = Flags[flag].x
+            y = Flags[flag].y
+            distance = p[i].p[0]
+        }
+        const a1 = (coord.y - y)/(x-coord.x)
+        const b1 = (y**2 - coord.y**2 + x**2 - coord.x**2 + enemy_p.p[0]**2 - distance**2)/(2*(x-coord.x))
+
+        // //console.log(`a1=${a1} a2=${a2} b1=${b1} b2=${b2}`)
+        // const enemy_x = a1*((b1-b2)/(a2-a1))+b1
+        // const enemy_y = (b1-b2)/(a2-a1)
+        //
+        // if(isNaN(x) || Math.abs(x) === Infinity || isNaN(y) || Math.abs(x) === Infinity){
+        //     console.log(`list_x = ${list_x} a1 = ${a1} a2 = ${a2} b1 = ${b1} b2 = ${b2}`)
+        // }
+
+        const rad = enemy_p.p[1] * (Math.PI/180)
+        return {x:coord.x - enemy_p.p[0]*Math.cos(rad),
+            y:coord.y - enemy_p.p[0]*Math.sin(rad)}
+
+
     }
 
 
