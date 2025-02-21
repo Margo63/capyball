@@ -103,8 +103,12 @@ class Agent {
         switch(cmd){
             case "see":
                 if(this.run){
-                    console.log(this.getCoord(p))
+                    //console.log(this.getCoordinatesAgent(p))
+                    for(let i = 1; i<p.length;i++){
+                        if(p[i].cmd.p[0]==="p")
+                            this.getEnemyCoordinates(p, p[i].cmd)
 
+                    }
                 }
 
                 break;
@@ -134,33 +138,65 @@ class Agent {
         }
     }
 
-    getCoord(p){
+    getCoordinatesAgent(p){
 
 
         let list_x =[]
         let list_y =[]
         let list_distance =[]
+        let list_angle =[]
+        let list_duplicate = []
         for (let i = 1; i< p.length; i++) {
             const flag = p[i].cmd.p.join("")
             if (Flags[flag] === undefined) {
                 console.log(flag)
                 continue
             }
-            if(!(Flags[flag].x in list_x)){
+            if(list_x.indexOf(Flags[flag].x) === -1 && list_y.indexOf(Flags[flag].y) === -1){
                 list_x.push(Flags[flag].x)
                 list_y.push(Flags[flag].y)
                 list_distance.push(p[i].p[0])
+                list_angle.push(p[i].p[1])
+            } else {
+                //console.log("duplicate")
+              list_duplicate.push({x:Flags[flag].x , y:Flags[flag].y, distance: p[i].p[0]})
             }
 
             if(list_x.length === 3) break;
         }
-        if(list_x.length!==3) return {x: 0, y: 0};
+        if(list_x.length!==3){
+            if(list_x.length!==0 ){
+                const rad = list_angle[0] * (Math.PI/180)
+                return {x:list_x[0] - list_distance[0]*Math.cos(rad),
+                        y:list_y[0] - list_distance[0]*Math.sin(rad)}
+            }else{
+                return {x:-1,y:-1}
+            }
 
-        const a1 = (list_y[0] - list_y[1])/(list_x[1]-list_x[0])
-        const a2 = (list_y[0] - list_y[2])/(list_x[2]-list_x[0])
+            // if(list_x.length === 2){
+            //     return {x: (list_x[1]**2-list_x[0]**2+list_distance[0]**2-list_distance[1]**2)/(2*(list_x[1]-list_x[0])),
+            //         y:(list_y[1]**2-list_y[0]**2+list_distance[0]**2-list_distance[1]**2)/(2*(list_y[1]-list_y[0]))}
+            // }
+            // console.log("not three")
+            // return {x: 0, y: 0};
+        }else{
+            const a1 = (list_y[0] - list_y[1])/(list_x[1]-list_x[0])
+            const a2 = (list_y[0] - list_y[2])/(list_x[2]-list_x[0])
 
-        const b1 = (list_y[1]**2 - list_y[0]**2 + list_x[1]**2 - list_x[0]**2 + list_distance[0]**2 - list_distance[1]**2)/(2*(list_x[1]-list_x[0]))
-        const b2 = (list_y[2]**2 - list_y[0]**2 + list_x[2]**2 - list_x[0]**2 + list_distance[0]**2 - list_distance[2]**2)/(2*(list_x[2]-list_x[0]))
+            const b1 = (list_y[1]**2 - list_y[0]**2 + list_x[1]**2 - list_x[0]**2 + list_distance[0]**2 - list_distance[1]**2)/(2*(list_x[1]-list_x[0]))
+            const b2 = (list_y[2]**2 - list_y[0]**2 + list_x[2]**2 - list_x[0]**2 + list_distance[0]**2 - list_distance[2]**2)/(2*(list_x[2]-list_x[0]))
+
+            //console.log(`a1=${a1} a2=${a2} b1=${b1} b2=${b2}`)
+            const x = a1*((b1-b2)/(a2-a1))+b1
+            const y = (b1-b2)/(a2-a1)
+
+            if(isNaN(x) || Math.abs(x) === Infinity || isNaN(y) || Math.abs(x) === Infinity){
+                console.log(`list_x = ${list_x} a1 = ${a1} a2 = ${a2} b1 = ${b1} b2 = ${b2}`)
+            }
+            return {x: x, y: y}
+        }
+
+
 
         // let A = []
         // let b = []
@@ -182,8 +218,15 @@ class Agent {
         //     //console.log(`${p[i].p}: ${p[i].cmd.p.join("")}`)
         // }
         // console.log([A,b])
-        return {x: a1*((b1-b2)/(a2-a1))+b1, y: (b1-b2)/(a2-a1)}
+
     }
+
+    getEnemyCoordinates(p,enemy_p){
+        console.log(enemy_p)
+        return {x:0,y:0}
+    }
+
+
 
 
 }
