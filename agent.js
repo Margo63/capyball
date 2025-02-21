@@ -226,21 +226,51 @@ class Agent {
     }
 
     getEnemyCoordinates(p,enemy_p, coord){
-        let x
-        let y
-        let distance
+        let list_x =[]
+        let list_y =[]
+        let list_distance =[]
+        let list_angle =[]
+        let list_duplicate = []
         for (let i = 1; i< p.length; i++) {
             const flag = p[i].cmd.p.join("")
             if (Flags[flag] === undefined) {
                 console.log(flag)
                 continue
             }
-            x = Flags[flag].x
-            y = Flags[flag].y
-            distance = p[i].p[0]
+            if(list_x.indexOf(Flags[flag].x) === -1 && list_y.indexOf(Flags[flag].y) === -1){
+                list_x.push(Flags[flag].x)
+                list_y.push(Flags[flag].y)
+                list_distance.push(p[i].p[0])
+                list_angle.push(p[i].p[1])
+            } else {
+                //console.log("duplicate")
+                list_duplicate.push({x:Flags[flag].x , y:Flags[flag].y, distance: p[i].p[0]})
+            }
+
+            if(list_x.length === 2) break;
         }
-        const a1 = (coord.y - y)/(x-coord.x)
-        const b1 = (y**2 - coord.y**2 + x**2 - coord.x**2 + enemy_p.p[0]**2 - distance**2)/(2*(x-coord.x))
+        if(list_x.length === 2){
+            const d1 = Math.sqrt(list_distance[0]**2 + enemy_p.p[0]**2 - 2 * list_distance[0] * enemy_p.p[0]*
+                Math.cos(Math.abs(list_angle[0]-enemy_p.p[1])))
+            const d2 = Math.sqrt(list_distance[1]**2 + enemy_p.p[0]**2 - 2 * list_distance[1] * enemy_p.p[0]*
+                Math.cos(Math.abs(list_angle[1]-enemy_p.p[1])))
+            const a1 = (coord.y - list_y[0])/(list_x[0]-coord.x)
+            const b1 = (list_y[0]**2 - coord.y**2 + list_x[0]**2 - coord.x**2 + enemy_p.p[0]**2 - d1**2)
+                /(2*(list_x[0]-coord.x))
+
+            const a2 = (coord.y - list_y[1])/(list_x[1]-coord.x)
+            const b2 = (list_y[1]**2 - coord.y**2 + list_x[1]**2 - coord.x**2 + enemy_p.p[0]**2 - d2**2)
+                /(2*(list_x[1]-coord.x))
+
+            const enemy_x = a1*((b1-b2)/(a2-a1))+b1
+            const enemy_y = (b1-b2)/(a2-a1)
+
+            if(isNaN(enemy_x) || Math.abs(enemy_x) === Infinity || isNaN(enemy_y) || Math.abs(enemy_y) === Infinity){
+                console.log(`list_x = ${list_x} a1 = ${a1} a2 = ${a2} b1 = ${b1} b2 = ${b2}`)
+            }
+            return{x:enemy_x,y:enemy_y}
+
+        }
 
         // //console.log(`a1=${a1} a2=${a2} b1=${b1} b2=${b2}`)
         // const enemy_x = a1*((b1-b2)/(a2-a1))+b1
@@ -250,9 +280,9 @@ class Agent {
         //     console.log(`list_x = ${list_x} a1 = ${a1} a2 = ${a2} b1 = ${b1} b2 = ${b2}`)
         // }
 
-        const rad = enemy_p.p[1] * (Math.PI/180)
-        return {x:coord.x - enemy_p.p[0]*Math.cos(rad),
-            y:coord.y - enemy_p.p[0]*Math.sin(rad)}
+        // const rad = enemy_p.p[1] * (Math.PI/180)
+        // return {x:coord.x - enemy_p.p[0]*Math.cos(rad),
+        //     y:coord.y - enemy_p.p[0]*Math.sin(rad)}
 
 
     }
