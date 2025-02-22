@@ -37,7 +37,7 @@ const Flags = {
 class Agent {
     constructor() {
         this.position = "l" // По умолчанию
-        this.run = false // ИГра начата
+        this.run = false // Игра начата
         this.act = null // Действия
         this.rl = readline.createInterface({// Чтение консоли
             input: process.stdin,
@@ -48,16 +48,16 @@ class Agent {
         this.rl.on('line', (input) => { //Обработка строки из консоли
                 if (this.run) {// Если игра начата
 
-                    // ДВижения вперед, вправо, влево, удар по мячу
+                    // Движения вперед, вправо, влево, удар по мячу
                     if ("w" == input) this.act = {n: "dash", v: 100}
                     if ("d" == input) this.act = {n: "turn", v: 20}
                     if ("a" == input) this.act = {n: "turn", v: -20}
                     if ("s" == input) this.act = {n: "kick", v: 100}
 
-                }else{
+                } else {
                     const data = input.split(" ")
-                    if(data.length == 3){
-                        this.socketSend("move",data[0]+" "+data[1])
+                    if (data.length == 3) {
+                        this.socketSend("move", data[0] + " " + data[1])
                         //this.act = {n: "turn", v: parseInt(data[2])}
                         this.speed = parseInt(data[2])
                     }
@@ -69,9 +69,10 @@ class Agent {
 
 
     }
+
     msgGot(msg) { // Получение сообщения
         //console.log("2 msgGot"+msg)
-        let data = msg.toString('utf8') // ПРиведение к строке
+        let data = msg.toString('utf8') // Приведение к строке
         this.processMsg(data) // Разбор сообщения
         this.sendCmd() // Отправка команды
     }
@@ -80,38 +81,40 @@ class Agent {
         this.socket = socket
 
     }
+
     socketSend(cmd, value) {// Отправка команды
         //console.log("1 send msg: "+`(${cmd} ${value})`)
         this.socket.sendMsg(`(${cmd} ${value})`)
     }
+
     processMsg(msg) { // Обработка сообщения
         //console.log("3 processMsg:"+msg)
         let data = Msg.parseMsg(msg) // Разбор сообщения
-        if(!data) throw new Error("Parse error\n" + msg)
+        if (!data) throw new Error("Parse error\n" + msg)
         // Первое (hear) — начало игры
-        if(data.cmd == "hear") this.run = true
-        if(data.cmd == "init") this.initAgent(data.p)//init
+        if (data.cmd == "hear") this.run = true
+        if (data.cmd == "init") this.initAgent(data.p)//init
         this.analyzeEnv(data.msg, data.cmd, data.p) // Обработка
     }
+
     initAgent(p) {
-        if(p[0] == "r") this.position = "r" // Правая половина поля
-        if(p[1]) this.id = p[1] // id игрока
+        if (p[0] == "r") this.position = "r" // Правая половина поля
+        if (p[1]) this.id = p[1] // id игрока
     }
-    analyzeEnv(msg, cmd, p){// Анализ сообщения
+
+    analyzeEnv(msg, cmd, p) {// Анализ сообщения
         //console.log("4 get message"+cmd)
 
-        switch(cmd){
+        switch (cmd) {
             case "see":
-                if(this.run){
+                if (this.run) {
                     const coord = this.getCoordinatesAgent(p)
                     console.log(coord)
-                    for(let i = 1; i<p.length;i++){
-                        if(p[i].cmd.p[0]==="p"){
-                            const enemy = this.getEnemyCoordinates(p, p[i],coord)
+                    for (let i = 1; i < p.length; i++) {
+                        if (p[i].cmd.p[0] === "p") {
+                            const enemy = this.getEnemyCoordinates(p, p[i], coord)
                             console.log(`enemy: ${enemy.x} ${enemy.y}`)
                         }
-
-
                     }
                 }
 
@@ -125,10 +128,8 @@ class Agent {
             default:
                 console.log("cmd not found")
         }
-
-
-
     }
+
     sendCmd() {
         if (this.run) { // Идра начата
             if (this.act) { // Есть команда от игрока
@@ -138,43 +139,43 @@ class Agent {
                     this.socketSend(this.act.n, this.act.v)
             }
             this.act = null // reset comand
-            this.socketSend("turn",`${this.speed}`) //every time turn after game start
+            this.socketSend("turn", `${this.speed}`) //every time turn after game start
         }
     }
 
-    getCoordinatesAgent(p){
-
-
-        let list_x =[]
-        let list_y =[]
-        let list_distance =[]
-        let list_angle =[]
+    getCoordinatesAgent(p) {
+        let list_x = []
+        let list_y = []
+        let list_distance = []
+        let list_angle = []
         let list_duplicate = []
-        for (let i = 1; i< p.length; i++) {
+        for (let i = 1; i < p.length; i++) {
             const flag = p[i].cmd.p.join("")
             if (Flags[flag] === undefined) {
                 console.log(flag)
                 continue
             }
-            if(list_x.indexOf(Flags[flag].x) === -1 && list_y.indexOf(Flags[flag].y) === -1){
+            if (list_x.indexOf(Flags[flag].x) === -1 && list_y.indexOf(Flags[flag].y) === -1) {
                 list_x.push(Flags[flag].x)
                 list_y.push(Flags[flag].y)
                 list_distance.push(p[i].p[0])
                 list_angle.push(p[i].p[1])
             } else {
                 //console.log("duplicate")
-              list_duplicate.push({x:Flags[flag].x , y:Flags[flag].y, distance: p[i].p[0]})
+                list_duplicate.push({x: Flags[flag].x, y: Flags[flag].y, distance: p[i].p[0]})
             }
 
-            if(list_x.length === 3) break;
+            if (list_x.length === 3) break;
         }
-        if(list_x.length!==3){
-            if(list_x.length!==0 ){
-                const rad = list_angle[0] * (Math.PI/180)
-                return {x:list_x[0] - list_distance[0]*Math.cos(rad),
-                        y:list_y[0] - list_distance[0]*Math.sin(rad)}
-            }else{
-                return {x:-1,y:-1}
+        if (list_x.length !== 3) {
+            if (list_x.length !== 0) {
+                const rad = list_angle[0] * (Math.PI / 180)
+                return {
+                    x: list_x[0] - list_distance[0] * Math.cos(rad),
+                    y: list_y[0] - list_distance[0] * Math.sin(rad)
+                }
+            } else {
+                return {x: -1, y: -1}
             }
 
             // if(list_x.length === 2){
@@ -183,25 +184,22 @@ class Agent {
             // }
             // console.log("not three")
             // return {x: 0, y: 0};
-        }else{
-            const a1 = (list_y[0] - list_y[1])/(list_x[1]-list_x[0])
-            const a2 = (list_y[0] - list_y[2])/(list_x[2]-list_x[0])
+        } else {
+            const a1 = (list_y[0] - list_y[1]) / (list_x[1] - list_x[0])
+            const a2 = (list_y[0] - list_y[2]) / (list_x[2] - list_x[0])
 
-            const b1 = (list_y[1]**2 - list_y[0]**2 + list_x[1]**2 - list_x[0]**2 + list_distance[0]**2 - list_distance[1]**2)/(2*(list_x[1]-list_x[0]))
-            const b2 = (list_y[2]**2 - list_y[0]**2 + list_x[2]**2 - list_x[0]**2 + list_distance[0]**2 - list_distance[2]**2)/(2*(list_x[2]-list_x[0]))
+            const b1 = (list_y[1] ** 2 - list_y[0] ** 2 + list_x[1] ** 2 - list_x[0] ** 2 + list_distance[0] ** 2 - list_distance[1] ** 2) / (2 * (list_x[1] - list_x[0]))
+            const b2 = (list_y[2] ** 2 - list_y[0] ** 2 + list_x[2] ** 2 - list_x[0] ** 2 + list_distance[0] ** 2 - list_distance[2] ** 2) / (2 * (list_x[2] - list_x[0]))
 
             //console.log(`a1=${a1} a2=${a2} b1=${b1} b2=${b2}`)
-            const x = a1*((b1-b2)/(a2-a1))+b1
-            const y = (b1-b2)/(a2-a1)
+            const x = a1 * ((b1 - b2) / (a2 - a1)) + b1
+            const y = (b1 - b2) / (a2 - a1)
 
-            if(isNaN(x) || Math.abs(x) === Infinity || isNaN(y) || Math.abs(x) === Infinity){
+            if (isNaN(x) || Math.abs(x) === Infinity || isNaN(y) || Math.abs(x) === Infinity) {
                 console.log(`list_x = ${list_x} a1 = ${a1} a2 = ${a2} b1 = ${b1} b2 = ${b2}`)
             }
             return {x: x, y: y}
         }
-
-
-
         // let A = []
         // let b = []
         // const x1 = Flags[p[1].cmd.p.join("")].x
@@ -225,50 +223,49 @@ class Agent {
 
     }
 
-    getEnemyCoordinates(p,enemy_p, coord){
-        let list_x =[]
-        let list_y =[]
-        let list_distance =[]
-        let list_angle =[]
+    getEnemyCoordinates(p, enemy_p, coord) {
+        let list_x = []
+        let list_y = []
+        let list_distance = []
+        let list_angle = []
         let list_duplicate = []
-        for (let i = 1; i< p.length; i++) {
+        for (let i = 1; i < p.length; i++) {
             const flag = p[i].cmd.p.join("")
             if (Flags[flag] === undefined) {
                 console.log(flag)
                 continue
             }
-            if(list_x.indexOf(Flags[flag].x) === -1 && list_y.indexOf(Flags[flag].y) === -1){
+            if (list_x.indexOf(Flags[flag].x) === -1 && list_y.indexOf(Flags[flag].y) === -1) {
                 list_x.push(Flags[flag].x)
                 list_y.push(Flags[flag].y)
                 list_distance.push(p[i].p[0])
                 list_angle.push(p[i].p[1])
             } else {
                 //console.log("duplicate")
-                list_duplicate.push({x:Flags[flag].x , y:Flags[flag].y, distance: p[i].p[0]})
+                list_duplicate.push({x: Flags[flag].x, y: Flags[flag].y, distance: p[i].p[0]})
             }
-
-            if(list_x.length === 2) break;
+            if (list_x.length === 2) break;
         }
-        if(list_x.length === 2){
-            const d1 = Math.sqrt(list_distance[0]**2 + enemy_p.p[0]**2 - 2 * list_distance[0] * enemy_p.p[0]*
-                Math.cos(Math.abs(list_angle[0]-enemy_p.p[1])))
-            const d2 = Math.sqrt(list_distance[1]**2 + enemy_p.p[0]**2 - 2 * list_distance[1] * enemy_p.p[0]*
-                Math.cos(Math.abs(list_angle[1]-enemy_p.p[1])))
-            const a1 = (coord.y - list_y[0])/(list_x[0]-coord.x)
-            const b1 = (list_y[0]**2 - coord.y**2 + list_x[0]**2 - coord.x**2 + enemy_p.p[0]**2 - d1**2)
-                /(2*(list_x[0]-coord.x))
+        if (list_x.length === 2) {
+            const d1 = Math.sqrt(list_distance[0] ** 2 + enemy_p.p[0] ** 2 - 2 * list_distance[0] * enemy_p.p[0] *
+                Math.cos(Math.abs(list_angle[0] - enemy_p.p[1])))
+            const d2 = Math.sqrt(list_distance[1] ** 2 + enemy_p.p[0] ** 2 - 2 * list_distance[1] * enemy_p.p[0] *
+                Math.cos(Math.abs(list_angle[1] - enemy_p.p[1])))
+            const a1 = (coord.y - list_y[0]) / (list_x[0] - coord.x)
+            const b1 = (list_y[0] ** 2 - coord.y ** 2 + list_x[0] ** 2 - coord.x ** 2 + enemy_p.p[0] ** 2 - d1 ** 2)
+                / (2 * (list_x[0] - coord.x))
 
-            const a2 = (coord.y - list_y[1])/(list_x[1]-coord.x)
-            const b2 = (list_y[1]**2 - coord.y**2 + list_x[1]**2 - coord.x**2 + enemy_p.p[0]**2 - d2**2)
-                /(2*(list_x[1]-coord.x))
+            const a2 = (coord.y - list_y[1]) / (list_x[1] - coord.x)
+            const b2 = (list_y[1] ** 2 - coord.y ** 2 + list_x[1] ** 2 - coord.x ** 2 + enemy_p.p[0] ** 2 - d2 ** 2)
+                / (2 * (list_x[1] - coord.x))
 
-            const enemy_x = a1*((b1-b2)/(a2-a1))+b1
-            const enemy_y = (b1-b2)/(a2-a1)
+            const enemy_x = a1 * ((b1 - b2) / (a2 - a1)) + b1
+            const enemy_y = (b1 - b2) / (a2 - a1)
 
-            if(isNaN(enemy_x) || Math.abs(enemy_x) === Infinity || isNaN(enemy_y) || Math.abs(enemy_y) === Infinity){
+            if (isNaN(enemy_x) || Math.abs(enemy_x) === Infinity || isNaN(enemy_y) || Math.abs(enemy_y) === Infinity) {
                 console.log(`list_x = ${list_x} a1 = ${a1} a2 = ${a2} b1 = ${b1} b2 = ${b2}`)
             }
-            return{x:enemy_x,y:enemy_y}
+            return {x: enemy_x, y: enemy_y}
 
         }
 
@@ -286,8 +283,6 @@ class Agent {
 
 
     }
-
-
 
 
 }
