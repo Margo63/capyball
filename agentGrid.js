@@ -58,6 +58,7 @@ class Agent {
         })
         this.angle = 0.0
         this.speed = 0
+        console.log("Write X Y Speed")
         this.rl.on('line', (input) => { //Обработка строки из консоли
                 if (this.run) {// Если игра начата
 
@@ -67,6 +68,7 @@ class Agent {
                     if ("a" == input) this.act = {n: "turn", v: -20}
                     if ("s" == input) this.act = {n: "kick", v: 100}
                 } else {
+
                     const data = input.split(" ")
                     if (data.length == 3) {
                         this.socketSend("move", data[0] + " " + data[1])
