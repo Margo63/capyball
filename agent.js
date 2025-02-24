@@ -29,6 +29,8 @@ const Flags = {
     flt: {x: -52.5, y: 34}, fct: {x: 0, y: 34},
     frt: {x: 52.5, y: 34}, flb: {x: -52.5, y: -34},
     fcb: {x: 0, y: -34}, frb: {x: 52.5, y: -34},
+    // ll: {x: -52.5}, lt: {y: 34},
+    // lb: {y: -34}, lr: {x: 52.5},
     distance(p1, p2) {
         return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
     },
@@ -53,7 +55,6 @@ class Agent {
                     if ("d" == input) this.act = {n: "turn", v: 20}
                     if ("a" == input) this.act = {n: "turn", v: -20}
                     if ("s" == input) this.act = {n: "kick", v: 100}
-
                 } else {
                     const data = input.split(" ")
                     if (data.length == 3) {
@@ -61,13 +62,9 @@ class Agent {
                         //this.act = {n: "turn", v: parseInt(data[2])}
                         this.speed = parseInt(data[2])
                     }
-
                 }
-
             }
         )
-
-
     }
 
     msgGot(msg) { // Получение сообщения
@@ -79,7 +76,6 @@ class Agent {
 
     setSocket(socket) { //Настройка сокета
         this.socket = socket
-
     }
 
     socketSend(cmd, value) {// Отправка команды
@@ -103,8 +99,6 @@ class Agent {
     }
 
     analyzeEnv(msg, cmd, p) {// Анализ сообщения
-        //console.log("4 get message"+cmd)
-
         switch (cmd) {
             case "see":
                 if (this.run) {
@@ -117,10 +111,8 @@ class Agent {
                         }
                     }
                 }
-
                 break;
             case "hear":
-
                 break;
             case "sense_body":
 
@@ -131,11 +123,11 @@ class Agent {
     }
 
     sendCmd() {
-        if (this.run) { // Идра начата
+        if (this.run) { // Игра начата
             if (this.act) { // Есть команда от игрока
                 if (this.act.n == "kick") // Пнуть мяч
                     this.socketSend(this.act.n, this.act.v + " 0")
-                else // ДВижение и поворот
+                else // Движение и поворот
                     this.socketSend(this.act.n, this.act.v)
             }
             this.act = null // reset comand
@@ -266,7 +258,6 @@ class Agent {
                 console.log(`list_x = ${list_x} a1 = ${a1} a2 = ${a2} b1 = ${b1} b2 = ${b2}`)
             }
             return {x: enemy_x, y: enemy_y}
-
         }
 
         // //console.log(`a1=${a1} a2=${a2} b1=${b1} b2=${b2}`)
@@ -283,8 +274,6 @@ class Agent {
 
 
     }
-
-
 }
 
 module.exports = Agent //hero export
