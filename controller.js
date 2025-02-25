@@ -1,6 +1,3 @@
-const Msg = require('./msg')
-const readline = require('readline')
-
 const Flags = {
     ftl50: {x: -50, y: -39}, ftl40: {x: -40, y: -39},
     ftl30: {x: -30, y: -39}, ftl20: {x: -20, y: -39},
@@ -35,7 +32,8 @@ const Flags = {
         return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
     },
 }
-/*const predict = (obj_x, oby_y, obj_angle, target_dist, target_angle) => {
+
+const predict = (obj_x, oby_y, obj_angle, target_dist, target_angle) => {
     const angle = -obj_angle + target_angle
     const predX = obj_x + target_dist * Math.cos(angle)
     const predY = oby_y + target_dist * Math.sin(angle)
@@ -44,82 +42,20 @@ const Flags = {
 
 const toRadians = (grad) => {
     return grad * Math.PI / 180
-}*/
+}
 
-class Agent {
+class Controller {
     constructor() {
-        this.position = "l" // По умолчанию
-        this.run = false // Игра начата
-        this.act = null // Действия
-
-
-        this.rl = readline.createInterface({// Чтение консоли
-            input: process.stdin,
-            output: process.stdout
-
-        })
-        this.angle = 0.0
-        this.speed = 0
-        console.log("Write X Y Speed")
-        this.rl.on('line', (input) => { //Обработка строки из консоли
-                if (this.run) {// Если игра начата
-
-                    // Движения вперед, вправо, влево, удар по мячу
-                    if ("w" == input) this.act = {n: "dash", v: 100}
-                    if ("d" == input) this.act = {n: "turn", v: 20}
-                    if ("a" == input) this.act = {n: "turn", v: -20}
-                    if ("s" == input) this.act = {n: "kick", v: 100}
-                } else {
-
-                    const data = input.split(" ")
-                    if (data.length == 3) {
-                        this.socketSend("move", data[0] + " " + data[1])
-                        //this.act = {n: "turn", v: parseInt(data[2])}
-                        this.speed = parseInt(data[2])
-                    }
-                }
-            }
-        )
+        this.comands = [{act: "flag", fl: "frb"}, {act: "flag", fl: "gl"},
+            {асt: "flag", fl: "fc"}, {act: "kick", fl: "b", goal: "gr"}]
+        this.done_commands = 0
+        this.run = true
+        this.act = null
     }
 
-    msgGot(msg) { // Получение сообщения
-        //console.log("2 msgGot"+msg)
-        let data = msg.toString('utf8') // Приведение к строке
-        this.processMsg(data) // Разбор сообщения
-        this.sendCmd() // Отправка команды
-    }
+    analyze(msg, cmd, p) {
 
-    setSocket(socket) { //Настройка сокета
-        this.socket = socket
-    }
-
-    setController(controller){
-        this.controller = controller
-    }
-    socketSend(cmd, value) {// Отправка команды
-        //console.log("1 send msg: "+`(${cmd} ${value})`)
-        this.socket.sendMsg(`(${cmd} ${value})`)
-    }
-
-    processMsg(msg) { // Обработка сообщения
-        //console.log("3 processMsg:"+msg)
-        let data = Msg.parseMsg(msg) // Разбор сообщения
-        if (!data) throw new Error("Parse error\n" + msg)
-        // Первое (hear) — начало игры
-        if (data.cmd == "hear") this.run = true
-        if (data.cmd == "init") this.initAgent(data.p)//init
-        this.analyzeEnv(data.msg, data.cmd, data.p) // Обработка
-    }
-
-    initAgent(p) {
-        if (p[0] == "l") this.position = "l" // Правая половина поля
-        if (p[1]) this.id = p[1] // id игрока
-    }
-
-    analyzeEnv(msg, cmd, p) {// Анализ сообщения
-        this.act = this.controller.analyze(msg, cmd, p)
-
-        /*switch (cmd) {
+        switch (cmd) {
             case "see":
                 if (this.run) {
                     let see_flags = []
@@ -137,24 +73,41 @@ class Agent {
                             break
                         }
                     }
-                    //console.log(p)
-                    if (this.done_commands < this.comands.length) {
+                    //console.log(see_flags)
+                    if(this.comands[this.done_commands].act == "flag"){
+                        const index = see_flags.indexOf(this.comands[this.done_commands].fl)
+                        if (index !== -1 ) {
+                            //console.log("see flag")
 
-                        if (this.comands[this.done_commands].fl in see_flags){
-                            this.act = {n:"dash",v:100}
+                            if(p[index].p!==undefined && p[index].p[0]>3){
+                                console.log(p[index].p[1])
+                                if(Math.abs(p[index].p[1])>30){
+                                    this.act = {n: "turn", v: p[index].p[1]}
+                                }else{
+                                    this.act = {n: "dash", v: 100}
+                                }
+                            }else{
+                                console.log("stop")
+                                this.done_commands++
+                                if(this.done_commands >= this.comands.length) this.done_commands = 0
+                                this.act = {n: "dash", v: 0}
+                            }
 
-                        }else{
-                            this.act = {n:"turn",v:20}
+
+                        } else {
+                            //console.log("turn")
+                            this.act = {n: "turn", v: 20}
                         }
+                    }else{
 
-                    } else {
-                        this.done_commands = 0
                     }
+
+
 
                 }
                 break;
             case "hear":
-                console.log(msg, p)
+                //console.log(msg, p)
 
                 break;
             case "sense_body":
@@ -168,23 +121,11 @@ class Agent {
                 break;
             default:
             //console.log("cmd not found")
-        }*/
-    }
-
-    sendCmd() {
-        if (this.run) { // Игра начата
-            if (this.act) { // Есть команда от игрока
-                if (this.act.n == "kick") // Пнуть мяч
-                    this.socketSend(this.act.n, this.act.v + " 0")
-                else // Движение и поворот
-                    this.socketSend(this.act.n, this.act.v)
-            }
-            this.act = null // reset comand
-            //this.socketSend("turn", `${this.speed}`) //every time turn after game start
         }
+        return this.act
     }
 
-    /*getMyCoordinates(visibleObjects) {
+    getMyCoordinates(visibleObjects) {
         const objects = visibleObjects.slice(1).map(obj => {
             const coord = Flags[obj.cmd_merged];
             if (coord !== undefined)
@@ -244,7 +185,8 @@ class Agent {
     getEnemyInfo(enemy_p, coord) {
         let predictXY = predict(coord.x, coord.y, parseFloat(this.angle), enemy_p.p[0], toRadians(enemy_p.p[1]))
         return {x: predictXY.x, y: predictXY.y, team: enemy_p.cmd.p[1]}
-    }*/
-}
+    }
 
-module.exports = Agent
+
+}
+module.exports = Controller
