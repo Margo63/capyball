@@ -46,11 +46,13 @@ const toRadians = (grad) => {
 
 class Controller {
     constructor() {
-        this.comands = [{act: "flag", fl: "frb"}, {act: "flag", fl: "gl"},
-            {асt: "flag", fl: "fc"}, {act: "kick", fl: "b", goal: "gr"}]
+        this.comands = [{act: "kick", fl: "b", goal: "gr"},{act: "flag", fl: "frb"}, {act: "flag", fl: "gl"},
+            {асt: "flag", fl: "fc"}, ]
         this.done_commands = 0
-        this.run = true
+        this.run = false
         this.act = null
+        this.speed = 30
+        this.turn_angle = 5
     }
 
     analyze(msg, cmd, p) {
@@ -74,33 +76,55 @@ class Controller {
                         }
                     }
                     //console.log(see_flags)
-                    if(this.comands[this.done_commands].act == "flag"){
-                        const index = see_flags.indexOf(this.comands[this.done_commands].fl)
-                        if (index !== -1 ) {
-                            //console.log("see flag")
+                    const index = see_flags.indexOf(this.comands[this.done_commands].fl)
+                    if (index !== -1 ) {
+                        //console.log("see flag")
 
-                            if(p[index].p!==undefined && p[index].p[0]>3){
-                                console.log(p[index].p[1])
-                                if(Math.abs(p[index].p[1])>30){
+                        if(this.comands[this.done_commands].act == "flag"){
+                            //if distance > 3m go to flag or turn
+                            if(p[index].p!==undefined && p[index].p[0] > 3){
+                                //console.log(p[index].p[1])
+                                //if angle to big or distance then turn
+                                if(Math.abs(p[index].p[1]) > 30 /*&& p[index].p[0] > 40*/){
                                     this.act = {n: "turn", v: p[index].p[1]}
+
+
                                 }else{
-                                    this.act = {n: "dash", v: 100}
+                                    this.act = {n: "dash", v: this.speed}
+
                                 }
+
                             }else{
-                                console.log("stop")
+                                console.log("stop: find flag - " + see_flags[index])
                                 this.done_commands++
                                 if(this.done_commands >= this.comands.length) this.done_commands = 0
                                 this.act = {n: "dash", v: 0}
                             }
 
+                        }else if(this.comands[this.done_commands].act == "kick"){
+                            if(p[index].p!==undefined && p[index].p[0] > 1){
+                                //console.log(p[index].p[1])
 
-                        } else {
-                            //console.log("turn")
-                            this.act = {n: "turn", v: 20}
+                                if(Math.abs(p[index].p[1]) > 20){
+                                    this.act = {n: "turn", v: p[index].p[1]}
+                                }else{
+                                    this.act = {n: "dash", v: this.speed}
+                                }
+
+                            }else{
+                                console.log("stop: find flag - " + see_flags[index])
+                                this.done_commands++
+                                if(this.done_commands >= this.comands.length) this.done_commands = 0
+                                this.act = {n: "kick", v: 100}
+                            }
                         }
-                    }else{
 
+
+                    } else {
+                        //console.log("turn")
+                        this.act = {n: "turn", v: 10}
                     }
+
 
 
 
@@ -108,7 +132,7 @@ class Controller {
                 break;
             case "hear":
                 //console.log(msg, p)
-
+                if(p[2]==='play_on') this.run = true;
                 break;
             case "sense_body":
                 for (let i = 1; i < p.length; i++) {
