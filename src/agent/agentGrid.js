@@ -1,4 +1,4 @@
-const Msg = require('./msg')
+const Msg = require('../serverCommunication/msg')
 const readline = require('readline')
 
 class Agent {
