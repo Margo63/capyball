@@ -1,7 +1,7 @@
-class Mgr {
+class Manager {
 
-    getAction(dt, p) {
-        this.p = p
+    getAction(dt, labels) {
+        this.labels = labels
 
         function execute(dt, title) {
             const action = dt[title]
@@ -21,7 +21,27 @@ class Mgr {
             throw new Error(`Unexpected node in DT: ${title}`)
         }
 
+
         return execute(dt, "root")
     }
+
+    getVisible(fl){
+        return fl in this.labels.all_labels_name
+    }
+
+    getDistance(fl){
+        // TODO create hash map with flags
+        let index = this.labels.constant_labels.findIndex(function (el){
+            return el.fl === fl
+        });
+        return this.labels.constant_labels[index].distance
+    }
+
+    getAngle(fl){
+        let index = this.labels.constant_labels.findIndex(function (el){
+            return el.fl === fl
+        });
+        return this.labels.constant_labels[index].angle
+    }
 }
-module.exports = Mgr
+module.exports = Manager

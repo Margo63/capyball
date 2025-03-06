@@ -19,14 +19,14 @@ const DT = {
         falseCond: "rotate"
     },
     rotate: {
-        exec(mgr, state) {
+        exec(mgr, state) {//add rotate from controller
             state.command = {n: "turn", v: "90"}
         },
         next: "sendCommand",
     }
     ,
     rootNext: {
-        condition: (mgr, state) => state.action.act === F1,
+        condition: (mgr, state) => state.action.act === FL,
         trueCond: 'flagSeek',
         falseCond: "ballSeek",
     }
@@ -90,3 +90,4 @@ const DT = {
         next: "sendCommand"
     },
 }
+module.exports = DT
