@@ -93,7 +93,7 @@ class Manager {
     kickBallInVisible(fl){
         let angle = 45, v= 30
         let goal = getEnemyGoal(this.position)
-        angle = this.getTurnAngle(goal.coords, 45)
+        //angle = this.getTurnAngle(goal.coords, 45)
         return {n: "kick", v: v, a: angle}
     }
 
@@ -106,7 +106,22 @@ class Manager {
         }
     }
 
+    getBall(fl){
+        const index = this.labels.all_labels_name.indexOf(fl)
+        if(index!==-1){
+            const distance = this.labels.all_labels[index].p[0]
+            return distance <= 5
+        }else{
+            return false;
+        }
+    }
 
+    goToGates(fl){
+        if(fl == "gr"){
+            const index_ = this.labels.all_labels_name.indexOf(fl)
+        }
+
+    }
 
 
 }

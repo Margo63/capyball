@@ -1,5 +1,5 @@
 const {FLAGS, getEnemyGoal} = require('./utils/constants');
-const DT = require('./condTree/constCondTree');
+
 const Manager = require('./condTree/mgr');
 const {toRadians} = require('./utils/mathUtils');
 const {getEnemyInfo, getAgentBestCoordinates} = require('./utils/locationUtils');
@@ -7,7 +7,7 @@ const CommandQueue = require("./commandQueue");
 const {getTurnAngle, isGoal} = require("./utils/actUtils");
 
 class Controller {
-    constructor() {
+    constructor(DT) {
         this.commandsQueue = new CommandQueue(
             {act: "kick", fl: "b", goal: "gr"},
             {act: "flag", fl: "fct"},
