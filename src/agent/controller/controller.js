@@ -1,6 +1,6 @@
 const {FLAGS, getEnemyGoal} = require('./utils/constants');
-const {DT} = require('./condTree/constCondTree');
-const {mgr} = require('./condTree/mgr');
+const DT = require('./condTree/constCondTree');
+const Manager = require('./condTree/mgr');
 const {toRadians} = require('./utils/mathUtils');
 const {getEnemyInfo, getAgentBestCoordinates} = require('./utils/locationUtils');
 const CommandQueue = require("./commandQueue");
@@ -35,6 +35,7 @@ class Controller {
         this.id = null
         this.DT = DT
         this.debug = false
+        this.mgr = new Manager()
     }
 
     reset_act() {
@@ -82,13 +83,12 @@ class Controller {
             let labels = this.getSeeFlagsAndPreprocessingPSee(p)
 
 
-            let test = mgr.getAction(this.DT,labels)
-            console.log(test)
 
-            this.my_coord = getAgentBestCoordinates(labels.constant_labels, true)
+
+            this.my_coord = getAgentBestCoordinates(labels.constant_labels, false)
 
             if (labels.p_labels.length !== 0) {
-                const enemy = getEnemyInfo(labels.p_labels[0], this.my_coord, true)
+                const enemy = getEnemyInfo(labels.p_labels[0], this.my_coord, false)
             }
             //this.act = {n: "turn", v: 1}
             this.executeAct(labels)
@@ -189,49 +189,57 @@ class Controller {
     }
 
     executeAct(labels) {
+        //console.log(test)
+        // this.my_coord = getAgentBestCoordinates(labels.constant_labels, false)
+        //
+        // if (labels.p_labels.length !== 0) {
+        //     const enemy = getEnemyInfo(labels.p_labels[0], this.my_coord, false)
+        // }
+        //
+        this.act = this.mgr.getAction(this.DT,labels, this.my_coord, this.position)
 
-        if (this.commandsQueue.isEmpty()) {
-            if(this.debug)  console.log("NO COMMAND ")
-            this.reset_act()
-            return  // TODO тут можно бежать к центру поля, например
-        }
-        let currentCommand = this.commandsQueue.peek()
-        if(this.debug) console.log("CURRENT COMMAND ", currentCommand)
-        switch (currentCommand.act) {
-            case "cmd":
-                this.act = currentCommand.cmd
-                this.commandsQueue.dequeue()
-                break
-            default: {
-                const index = labels.all_labels_name.indexOf(currentCommand.fl)
-                if (index !== -1) {
-                    //console.log("CURRENT all_labels ", labels.all_labels[index])
-                    switch (currentCommand.act) {
-                        case "flag":
-                            if (this.goToObject(labels.all_labels[index].p[0], labels.all_labels[index].p[1],
-                                3, 10, false, currentCommand)) {
-                                this.commandsQueue.dequeue()
-                                this.executeAct(labels)
-                                return
-                            }
-                            break
-                        case "kick":
-                            if (this.goToObject(labels.all_labels[index].p[0], labels.all_labels[index].p[1],
-                                1, 10, false, currentCommand)) {
-                                this.kickBall(labels, labels.all_labels[index],)
-                            }
-                            break
-                        default:
-                            this.reset_act()
-                            return
-                    }
-                } else {
-                    let constantCoords = FLAGS[currentCommand.fl]
-                    this.act = {n: "turn", v: this.getTurnAngle(constantCoords)}
-                    if(this.debug)   console.log("THIS ACT", this.act)
-                }
-            }
-        }
+        // if (this.commandsQueue.isEmpty()) {
+        //     if(this.debug)  console.log("NO COMMAND ")
+        //     this.reset_act()
+        //     return  // TODO тут можно бежать к центру поля, например
+        // }
+        // let currentCommand = this.commandsQueue.peek()
+        // if(this.debug) console.log("CURRENT COMMAND ", currentCommand)
+        // switch (currentCommand.act) {
+        //     case "cmd":
+        //         this.act = currentCommand.cmd
+        //         this.commandsQueue.dequeue()
+        //         break
+        //     default: {
+        //         const index = labels.all_labels_name.indexOf(currentCommand.fl)
+        //         if (index !== -1) {
+        //             //console.log("CURRENT all_labels ", labels.all_labels[index])
+        //             switch (currentCommand.act) {
+        //                 case "flag":
+        //                     if (this.goToObject(labels.all_labels[index].p[0], labels.all_labels[index].p[1],
+        //                         3, 10, false, currentCommand)) {
+        //                         this.commandsQueue.dequeue()
+        //                         this.executeAct(labels)
+        //                         return
+        //                     }
+        //                     break
+        //                 case "kick":
+        //                     if (this.goToObject(labels.all_labels[index].p[0], labels.all_labels[index].p[1],
+        //                         1, 10, false, currentCommand)) {
+        //                         this.kickBall(labels, labels.all_labels[index],)
+        //                     }
+        //                     break
+        //                 default:
+        //                     this.reset_act()
+        //                     return
+        //             }
+        //         } else {
+        //             let constantCoords = FLAGS[currentCommand.fl]
+        //             this.act = {n: "turn", v: this.getTurnAngle(constantCoords)}
+        //             if(this.debug)   console.log("THIS ACT", this.act)
+        //         }
+        //     }
+        // }
     }
 
     getTurnAngle(constantCoords, default_value) {

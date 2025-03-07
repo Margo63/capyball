@@ -1,8 +1,9 @@
 const FL = "flag", KI = "kick"
+
 const DT = {
     state: {
         next: 0,
-        sequence: [{act: FL, f1: "frb"}, {act: FL, fl: 'gl'}, {act: KI, fl: "b", goal: "gr"}],
+        sequence: [{act: FL, fl: "frb"}, {act: FL, fl: 'gl'}, {act: KI, fl: "b", goal: "gr"}],
         command: null
     },
     root: {
@@ -52,7 +53,7 @@ const DT = {
     ,
     rotateToGoal: {
         exec(mgr, state) {
-            state.command = {n: "turn", v: mgr.getAngle(state.action.f1)}
+            state.command = {n: "turn", v: mgr.getAngle(state.action.fl)}
         },
         next: "sendCommand"
     }
@@ -79,13 +80,13 @@ const DT = {
     },
     ballGoalVisible: {
         exec(mgr, state) {
-            state.command = {n: "kick", v: '100 ${mgr.getAngle (state.action.goal)}'}
+            state.command = mgr.kickBallVisible(state.action.goal) //{n: "kick", v: `100  ${mgr.getAngle(state.action.goal)}`}
         },
         next: "sendCommand"
     },
     ballGoalInvisible: {
         exec(mgr, state) {
-            state.command = {n: "kick", v: "10 45"}
+            state.command = mgr.kickBallInVisible(state.action.goal)
         },
         next: "sendCommand"
     },

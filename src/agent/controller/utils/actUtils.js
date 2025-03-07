@@ -23,7 +23,7 @@ class ActUtils {
 
         // Разница между углом к цели и текущим углом игрока
         let turnAngle = angleToTarget - p_angle;
-        console.log("getTurnAngle", x_p, y_p, p_angle, x_o, y_o, angleToTarget, p_angle)
+        //console.log("getTurnAngle", x_p, y_p, p_angle, x_o, y_o, angleToTarget, p_angle)
 
         return normGrad(toGrad(turnAngle));
     }

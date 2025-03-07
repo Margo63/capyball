@@ -70,7 +70,7 @@ class Agent {
                     this.socketSend(this.act.n, this.act.v + " "+ this.act.a)
                 else // Движение и поворот
                     this.socketSend(this.act.n, this.act.v)
-                console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACT", this.act)
+                //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACT", this.act)
             }
             this.act = null // reset comand
             //this.socketSend("turn", `${this.speed}`) //every time turn after game start
