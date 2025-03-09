@@ -1,8 +1,9 @@
-const {getEnemyGoal} = require("../utils/constants");
+const {getEnemyGoal, getMyGoal, FLAGS} = require("../utils/constants");
+const {getTurnAngle, isGoal} = require("../utils/actUtils");
 
 class Manager {
 
-    constructor(labels,agent,position) {
+    constructor(labels, agent, position) {
         //console.log("constructor")
         this.labels = labels
         this.agent = agent
@@ -14,116 +15,91 @@ class Manager {
         this.agent = agent
         this.position = position
         //console.log("getAction\n"+this.labels)
-        const manager = new Manager(labels,agent,position)
+        const manager = this
 
         function execute(dt, title) {
-            const action = dt[title]
-            if (typeof action.exec == "function") {
-                action.exec(manager, dt.state)
-                return execute(dt, action.next)
-            }
-            if (typeof action.condition == "function") {
+            let current_title = title
 
-                const cond = action.condition(manager, dt.state)
-                if (cond)
-                    return execute(dt, action.trueCond)
-                return execute(dt, action.falseCond)
+            while (current_title !== dt.terminate_command) {
+                console.log(current_title)
+                const action = dt[current_title]
+                if (typeof action.exec == "function") {
+                    action.exec(manager, dt.state)
+                }
+                current_title = action.next(manager, dt.state)
             }
-            if (typeof action.command == "function") {
-                return action.command(manager, dt.state)
-            }
-            throw new Error(`Unexpected node in DT: ${title}`)
+            return dt.state.command
         }
 
-        //console.log("tuta")
         return execute(dt, "root")
     }
 
     getVisible(fl) {
-        //console.log("getVisible "+fl+"\n"+this.labels.all_labels_name)
-        //console.log(this.labels.all_labels_name.indexOf(fl)!==-1)
-        return this.labels.all_labels_name.indexOf(fl)!==-1
+        return this.getIndex(fl) !== -1
     }
 
     getDistance(fl) {
-        // TODO create hash map with flags
-        //console.log("getDistance "+fl+"\n"+this.labels.constant_labels)
-        const index = this.labels.all_labels_name.indexOf(fl)
-        if(index!==-1)
-            return this.labels.all_labels[index].p[0]
-        // let index = this.labels.constant_labels.findIndex(function (el) {
-        //     return el.fl === fl
-        // });
-        // if(index!==-1)
-        //     return this.labels.constant_labels[index].distance
-        // else
-        // console.log(this.labels.constant_labels[index])
-
+        return this.getP(fl).p[0]
     }
 
     getAngle(fl) {
-        // let index = this.labels.constant_labels.findIndex(function (el) {
-        //     return el.fl === fl
-        // });
-        // return this.labels.constant_labels[index].angle
-
-        const index = this.labels.all_labels_name.indexOf(fl)
-        if(index!==-1)
-            return this.labels.all_labels[index].p[1]
+        return this.getP(fl).p[1]
     }
 
-    kickBallVisible(fl){
-        const index = this.labels.all_labels_name.indexOf(fl)
+
+    kickBallVisible(fl) {
+        const index = this.getIndex(fl)
         let angle, v
-        if (index !== -1) {
-            let minus_speed = Math.pow(this.labels.all_labels[index].p[0], 2) / 30
-            // уменьшение скорости на minus_speed для того, чтобы не кидать на большие расстояния
-            v = Math.max(100 - minus_speed, 10)
-            angle = this.labels.all_labels[index].p[1]
+        if (this.labels.all_labels[index].p[0] < 30) {
+            v = 100
         } else {
-            //noy used
-            console.log("IM NOT SEEING GOAL")
-            //angle = this.getTurnAngle(goal.coords, 45)
-            v = 30
+            let minus_speed = this.labels.all_labels[index].p[0]
+            // уменьшение скорости на minus_speed для того, чтобы не кидать на большие расстояния
+            v = Math.max(100 - minus_speed, 15)
         }
-
-        return {n: "kick", v: v, a: angle}
+        angle = this.labels.all_labels[index].p[1]
+        return {v: v, angle: angle}
     }
 
-    kickBallInVisible(fl){
-        let angle = 45, v= 30
+    kickBallInVisible(fl, isLastActTurn) {
+        let v = 30
         let goal = getEnemyGoal(this.position)
-        //angle = this.getTurnAngle(goal.coords, 45)
-        return {n: "kick", v: v, a: angle}
+        let angle = this.getTurnToObjectAngle(goal.coords, isLastActTurn, 45)
+        return {v: v, angle: angle}
     }
 
-    //sometimes call err "Maximum call stack size"
-    getTurnAngle(constantCoords, default_value) {
-        if (constantCoords !== undefined /*&& !this.isLastActTurn()/* если есть шанс, что запутался, то идём перебирать*/) {
-            return this.getTurnAngle(this.agent.x, this.agent.y, constantCoords.x, constantCoords.y, this.agent.angleRad)
+//sometimes call err "Maximum call stack size"
+    getTurnToObjectAngle(constantCoords, isLastActTurn, default_value) {
+        if (constantCoords !== undefined && !isLastActTurn/* если есть шанс, что запутался, то идём перебирать*/) {
+            return getTurnAngle(this.agent.x, this.agent.y, constantCoords.x, constantCoords.y, this.agent.angleRad)
         } else {
             return default_value ? default_value : 30
         }
     }
 
-    getBall(fl){
-        const index = this.labels.all_labels_name.indexOf(fl)
-        if(index!==-1){
-            const distance = this.labels.all_labels[index].p[0]
-            return distance <= 5
-        }else{
-            return false;
+    isNearGates(){
+        let myGoal = getMyGoal(this.position)
+        let isVisible = this.getVisible(myGoal.name)
+        console.log(isVisible, myGoal, getMyGoal(this.position))
+        return true
+    }
+
+    goToGates(fl) {
+        if (fl === "gr") {
+            const index_ = this.getIndex(fl)
         }
     }
 
-    goToGates(fl){
-        if(fl == "gr"){
-            const index_ = this.labels.all_labels_name.indexOf(fl)
-        }
-
+    getP(fl) {
+        const index = this.getIndex(fl)
+        if (index !== -1)
+            return this.labels.all_labels[index]
+        throw new Error(`Cannot find index of: ${fl}`)
     }
 
-
+    getIndex(fl) {
+        return this.labels.all_labels_name.indexOf(fl)
+    }
 }
 
 module.exports = Manager

@@ -8,23 +8,6 @@ const {getTurnAngle, isGoal} = require("./utils/actUtils");
 
 class Controller {
     constructor(DT) {
-        this.commandsQueue = new CommandQueue(
-            {act: "kick", fl: "b", goal: "gr"},
-            {act: "flag", fl: "fct"},
-            {act: "flag", fl: "gl"},
-            {act: "flag", fl: "fglb"},
-            {act: "flag", fl: "fct"},
-            {act: "flag", fl: "fplc"},
-            {act: "flag", fl: "fprt"},
-            {act: "flag", fl: "fplc"},
-            {act: "flag", fl: "fprb"},
-            {act: "flag", fl: "fplc"},
-            {act: "flag", fl: "fc"},
-            {act: "flag", fl: "frb"},
-            {act: "flag", fl: "gr"},
-            {act: "flag", fl: "fc"},
-            {act: "flag", fl: "frb"},
-            {асt: "flag", fl: "fc"})
         this.act = null
         this.last_act = null
         this.speed = 100
@@ -83,8 +66,6 @@ class Controller {
             let labels = this.getSeeFlagsAndPreprocessingPSee(p)
 
 
-
-
             this.my_coord = getAgentBestCoordinates(labels.constant_labels, false)
 
             if (labels.p_labels.length !== 0) {
@@ -96,23 +77,23 @@ class Controller {
     }
 
     evaluateHear(msg, p) {
-        if(this.debug) console.log(msg, p)
+        if (this.debug) console.log(msg, p)
         switch (p[2]) {
             case "play_on":
                 this.run = true
-                if(this.debug) console.log("PLAY WAS STARTED!")
+                if (this.debug) console.log("PLAY WAS STARTED!")
                 break
             default:
                 let isGoalMessage = isGoal(p[2], this.position)
                 if (isGoalMessage) {
-                    if(this.debug) console.log("GOOAL!!!")
+                    if (this.debug) console.log("GOOAL!!!")
                     if (isGoalMessage.win) {
-                        let currentCommand = this.commandsQueue.peek()
+                        let currentCommand =  this.DT.state.commands_queue.peek()
                         if (currentCommand && currentCommand.act === 'kick') {
-                            this.commandsQueue.dequeue()
+                            this.DT.state.commands_queue.dequeue()
                         }
                     } else {
-                        if(this.debug) console.log("GOAL...SAD...")
+                        if (this.debug) console.log("GOAL...SAD...")
                     }
                 }
         }
@@ -131,7 +112,7 @@ class Controller {
     evaluateInit(p) {
         this.position = p[0]
         this.id = p[1]
-        if(this.debug) console.log("INIT INFO", {side: p[0], number: p[1]})
+        if (this.debug) console.log("INIT INFO", {side: p[0], number: p[1]})
     }
 
     getSeeFlagsAndPreprocessingPSee(p, needLog) {
@@ -170,7 +151,7 @@ class Controller {
             }
         }
         if (needLog) {
-            if(this.debug)  console.log("-------------START----------------", all_labels_name,
+            if (this.debug) console.log("-------------START----------------", all_labels_name,
                 constant_labels,
                 p_labels,
                 g_labels,
@@ -189,110 +170,8 @@ class Controller {
     }
 
     executeAct(labels) {
-        //console.log(test)
-        // this.my_coord = getAgentBestCoordinates(labels.constant_labels, false)
-        //
-        // if (labels.p_labels.length !== 0) {
-        //     const enemy = getEnemyInfo(labels.p_labels[0], this.my_coord, false)
-        // }
-        //
-        this.act = this.mgr.getAction(this.DT,labels, this.my_coord, this.position)
-
-        // if (this.commandsQueue.isEmpty()) {
-        //     if(this.debug)  console.log("NO COMMAND ")
-        //     this.reset_act()
-        //     return  // TODO тут можно бежать к центру поля, например
-        // }
-        // let currentCommand = this.commandsQueue.peek()
-        // if(this.debug) console.log("CURRENT COMMAND ", currentCommand)
-        // switch (currentCommand.act) {
-        //     case "cmd":
-        //         this.act = currentCommand.cmd
-        //         this.commandsQueue.dequeue()
-        //         break
-        //     default: {
-        //         const index = labels.all_labels_name.indexOf(currentCommand.fl)
-        //         if (index !== -1) {
-        //             //console.log("CURRENT all_labels ", labels.all_labels[index])
-        //             switch (currentCommand.act) {
-        //                 case "flag":
-        //                     if (this.goToObject(labels.all_labels[index].p[0], labels.all_labels[index].p[1],
-        //                         3, 10, false, currentCommand)) {
-        //                         this.commandsQueue.dequeue()
-        //                         this.executeAct(labels)
-        //                         return
-        //                     }
-        //                     break
-        //                 case "kick":
-        //                     if (this.goToObject(labels.all_labels[index].p[0], labels.all_labels[index].p[1],
-        //                         1, 10, false, currentCommand)) {
-        //                         this.kickBall(labels, labels.all_labels[index],)
-        //                     }
-        //                     break
-        //                 default:
-        //                     this.reset_act()
-        //                     return
-        //             }
-        //         } else {
-        //             let constantCoords = FLAGS[currentCommand.fl]
-        //             this.act = {n: "turn", v: this.getTurnAngle(constantCoords)}
-        //             if(this.debug)   console.log("THIS ACT", this.act)
-        //         }
-        //     }
-        // }
-    }
-
-    getTurnAngle(constantCoords, default_value) {
-        if (constantCoords !== undefined && !this.isLastActTurn()/* если есть шанс, что запутался, то идём перебирать*/) {
-            return getTurnAngle(this.my_coord.x, this.my_coord.y, constantCoords.x, constantCoords.y, this.my_coord.angleRad)
-        } else {
-            return default_value ? default_value : 30
-        }
-    }
-
-    goToObject(dist_o, angle_o, goal_dist, goal_angle, needLog, currentCommand) {
-        if (dist_o > goal_dist) {
-            if (Math.abs(angle_o) > goal_angle) {
-                this.act = {n: "turn", v: angle_o}
-                if(this.debug) console.log("IM TURN TO", angle_o)
-            } else {
-                this.act = {n: "dash", v: this.speed}
-                if(this.debug)console.log("IM DACH WITH SPEED", this.speed)
-            }
-            return false // ещё идём
-        } else {
-            if (needLog) {
-                if(this.debug)  console.log("STOP! FIND FLAG", currentCommand.fl)
-            }
-            return true // пришли
-        }
-    }
-
-    kickBall(labels, ballInfo) {
-        let goal = getEnemyGoal(this.position)
-        const index = labels.all_labels_name.indexOf(goal.fl)
-        let angle, v
-        if (index !== -1) {
-            if(this.debug)   console.log("IM SEEING GOAL")
-            let minus_speed = Math.pow(labels.all_labels[index].p[0], 2) / 30
-            // уменьшение скорости на minus_speed для того, чтобы не кидать на большие расстояния
-            v = Math.max(100 - minus_speed, 10)
-            angle = labels.all_labels[index].p[1]
-        } else {
-            if(this.debug) console.log("IM NOT SEEING GOAL")
-            angle = this.getTurnAngle(goal.coords, 45)
-            v = 30
-            if(this.debug)  console.log("ANGLEE", angle)
-        }
-
-        this.act = {n: "kick", v: v, a: angle}
-        this.commandsQueue.enqueueFront({act: 'cmd', cmd: {n: "turn", v: angle}})
-    }
-
-    isLastActTurn() {
-        return this.last_act != null && this.last_act.n === 'turn'
+        this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position)
     }
 }
 
-module
-    .exports = Controller
+module.exports = Controller
