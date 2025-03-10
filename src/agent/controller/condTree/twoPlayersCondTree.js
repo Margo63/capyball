@@ -16,7 +16,7 @@ const DT_TwoPlayers = {
         command: null,
         prev_command: null,
         action: null,
-        closestTeammate: null // Добавляем поле для хранения ближайшего игрока
+        closestTeammate: null // мой лидер
     },
     root: {
         exec(mgr, state) {
@@ -74,9 +74,8 @@ const DT_TwoPlayers = {
                 return mgr.getAngle(state.action.fl) > Math.min(30, mgr.getDistance(state.action.fl) * 2)
                     ? "rotateToGoal"
                     : "runToGoal"
-            } else if (visibleTeammatesCount === 1) {
-                return "handleClosestTeammate";
             }
+            return "handleClosestTeammate";
         }
     },
     rotateToGoal: {
@@ -131,8 +130,15 @@ const DT_TwoPlayers = {
             const closestTeammate = teammates.reduce((closest, current) => {
                 return current.p[0] < closest.p[0] ? current : closest;
             });
+            if (state.closestTeammate !== closestTeammate) {
+                state.closestTeammate = closestTeammate;    // Сохраняем ближайшего игрока в состоянии
 
-            state.closestTeammate = closestTeammate; // Сохраняем ближайшего игрока в состоянии
+                let message = `obeyed_${mgr.id}_${state.closestTeammate.cmd.p[2]}`
+                state.commands_queue.enqueueFront({act: 'cmd', cmd: {n: "say", v: message}})
+
+            }
+
+
         },
         next: (mgr, state) => {
             const dist = state.closestTeammate.p[0];

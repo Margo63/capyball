@@ -3,13 +3,15 @@ const {getEnemyGoal, getMyGoal} = require("../utils/constants");
 const FL = "flag", KI = "kick", CMD = "cmd", GT = "gate", PR = "protect"
 
 const DT_Goalkeeper = {
-    terminate_command: "sendCommand", state: {
+    terminate_command: "sendCommand",
+    state: {
         // Очередь команд
         commands_queue: new CommandQueue(
             {act: "gate"}, // Занимаем позицию в воротах
             {act: "protect", fl: "b"} // Отбиваем мяч
         ), command: null, prev_command: null, // Предыдущая команда
         action: null, // Текущее действие
+
     },
     root: {
         exec(mgr, state) {

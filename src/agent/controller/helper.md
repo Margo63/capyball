@@ -162,3 +162,22 @@ cmd = {
     }
 }
  ```
+
+## sayFormat
+### reached
+someone reached his goal
+```javascript 
+message = "reached_${state.action.fl}"
+ ```
+
+### obeyed
+someone reached his goal
+```javascript 
+message = "obeyed_${state.action.fl}"
+ ```
+
+видит->принимает за лидера->говорит
+слышит->если это мой лидер, то сравнивает
+если он всё ещё мой лидер->повторяет
+если он уже не мой лидер->ищу другого менее близкого
+

@@ -9,13 +9,15 @@ class Manager {
         this.labels = null
         this.agent = null
         this.position = null
+        this.id = null
         this.team_name = team_name
     }
 
-    getAction(dt, labels, agent, position) {
+    getAction(dt, labels, agent, position, id) {
         this.labels = labels
         this.agent = agent
         this.position = position
+        this.id = id
         //console.log("getAction\n"+this.labels)
         const manager = this
 

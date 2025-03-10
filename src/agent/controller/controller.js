@@ -97,13 +97,22 @@ class Controller {
                     } else if (this.debug) {
                         console.log("GOAL...SAD...")
                     }
-                }else if (p[2].startsWith('"reached_')) {
+                } else if (p[2].startsWith('"reached_')) {
                     const message = p[2].replace(/"/g, ''); // Удаляем кавычки
                     console.log(p[2])
                     // Парсинг сообщения "reached fct"
                     const flag = message.split("_")[1]; // Получаем флаг из сообщения
 
                     if (this.debug) console.log(`Reached flag: ${flag}`);
+                    this.handleReachedFlag(flag);
+
+                } else if (p[2].startsWith('"obeyed_')) {
+                    const message = p[2].replace(/"/g, ''); // Удаляем кавычки
+                    console.log(p[2])
+                    // Парсинг сообщения "reached fct"
+                    const flag = message.split("_")[1]; // Получаем флаг из сообщения
+
+                    if (this.debug) console.log(`Obeyed to: ${flag}`);
                     // Здесь можно добавить дополнительную логику для обработки флага
                     this.handleReachedFlag(flag);
 
@@ -184,7 +193,7 @@ class Controller {
     }
 
     executeAct(labels) {
-        this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.team_name)
+        this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.id)
     }
 
     handleReachedFlag(flag) {
