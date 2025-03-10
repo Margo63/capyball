@@ -7,7 +7,7 @@ const CommandQueue = require("./commandQueue");
 const {getTurnAngle, isGoal} = require("./utils/actUtils");
 
 class Controller {
-    constructor(DT) {
+    constructor(DT, teamName) {
         this.act = null
         this.last_act = null
         this.speed = 100
@@ -15,10 +15,11 @@ class Controller {
         this.my_coord = {x: 0.0, y: 0.0}
         this.run = false
         this.position = null
+        this.team_name = teamName
         this.id = null
         this.DT = DT
         this.debug = false
-        this.mgr = new Manager()
+        this.mgr = new Manager(this.team_name)
     }
 
     reset_act() {
@@ -78,6 +79,7 @@ class Controller {
 
     evaluateHear(msg, p) {
         if (this.debug) console.log(msg, p)
+        console.log("IM HERERE", msg, p)
         switch (p[2]) {
             case "play_on":
                 this.run = true
@@ -88,15 +90,27 @@ class Controller {
                 if (isGoalMessage) {
                     if (this.debug) console.log("GOOAL!!!")
                     if (isGoalMessage.win) {
-                        let currentCommand =  this.DT.state.commands_queue.peek()
+                        let currentCommand = this.DT.state.commands_queue.peek()
                         if (currentCommand && currentCommand.act === 'kick') {
                             this.DT.state.commands_queue.dequeue()
                         }
-                    } else {
-                        if (this.debug) console.log("GOAL...SAD...")
+                    } else if (this.debug) {
+                        console.log("GOAL...SAD...")
                     }
+                }else if (p[2].startsWith('"reached_')) {
+                    const message = p[2].replace(/"/g, ''); // Удаляем кавычки
+                    console.log(p[2])
+                    // Парсинг сообщения "reached fct"
+                    const flag = message.split("_")[1]; // Получаем флаг из сообщения
+
+                    if (this.debug) console.log(`Reached flag: ${flag}`);
+                    // Здесь можно добавить дополнительную логику для обработки флага
+                    this.handleReachedFlag(flag);
+
                 }
+
         }
+
     }
 
     evaluateSenseBody(p) {
@@ -170,7 +184,16 @@ class Controller {
     }
 
     executeAct(labels) {
-        this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position)
+        this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.team_name)
+    }
+
+    handleReachedFlag(flag) {
+        let queue = this.DT.state.commands_queue
+        console.log(!queue.isEmpty(), queue.peek().act === "flag", queue.peek().fl === flag)
+        if (!queue.isEmpty() && queue.peek().act === "flag" && queue.peek().fl === flag) {
+            console.log("HEEREEE")
+            queue.dequeue()
+        }
     }
 }
 

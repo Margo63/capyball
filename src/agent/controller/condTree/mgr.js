@@ -4,11 +4,12 @@ const {distance} = require("../utils/locationUtils");
 
 class Manager {
 
-    constructor(labels, agent, position) {
+    constructor(team_name) {
         //console.log("constructor")
-        this.labels = labels
-        this.agent = agent
-        this.position = position
+        this.labels = null
+        this.agent = null
+        this.position = null
+        this.team_name = team_name
     }
 
     getAction(dt, labels, agent, position) {
@@ -68,13 +69,28 @@ class Manager {
         return {v: v, angle: angle}
     }
 
+    getVisibleTeammatesCount() {
+        return this.getVisibleTeammates().length
+    }
+
+    getVisibleTeammates() {
+        console.log(this.labels.p_labels[0] ? this.labels.p_labels[0].cmd.p : "", this.team_name)
+        const teammates = this.labels.p_labels.filter(player => {
+            console.log(player.cmd.p[1])
+            return player.cmd.p[1] === '"' + this.team_name + '"'; // Проверяем название команды
+
+        });
+        console.log(teammates)
+        return teammates;
+    }
+
     kickBallVisible(fl) {
         const index = this.getIndex(fl)
         let angle, v
         if (this.labels.all_labels[index].p[0] < 30) {
             v = 100
         } else {
-            let minus_speed = this.labels.all_labels[index].p[0]
+            let minus_speed = this.labels.p_labels
             // уменьшение скорости на minus_speed для того, чтобы не кидать на большие расстояния
             v = Math.max(100 - minus_speed, 20)
         }
@@ -95,19 +111,6 @@ class Manager {
             return getTurnAngle(this.agent.x, this.agent.y, constantCoords.x, constantCoords.y, this.agent.angleRad)
         } else {
             return default_value ? default_value : 30
-        }
-    }
-
-    isNearGates() {
-        let myGoal = getMyGoal(this.position)
-        let isVisible = this.getVisible(myGoal.name)
-        console.log(isVisible, myGoal, getMyGoal(this.position))
-        return true
-    }
-
-    goToGates(fl) {
-        if (fl === "gr") {
-            const index_ = this.getIndex(fl)
         }
     }
 
