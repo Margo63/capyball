@@ -6,9 +6,9 @@ const DT = {
     terminate_command: "sendCommand",
     state: {
         // пока оставила на всякий случай
-        sequence: [{act: FL, fl: "frb"}, {act: FL, fl: 'gl'}, {act: KI, fl: "b", goal: "gr"}], // массив целей - переделать на очередь
+        sequence: [{act: FL, fl: "frb"}, {act: FL, fl: 'gr'}, {act: KI, fl: "b", goal: "gr"}], // массив целей - переделать на очередь
         commands_queue: new CommandQueue(
-            {act: "kick", fl: "b", goal: "gr"},
+            {act: "kick", fl: "b", goal: "gl"},
             {act: "flag", fl: "fct"},
             {act: "flag", fl: "gl"},
             {act: "flag", fl: "fglb"},
@@ -106,7 +106,7 @@ const DT = {
     ballSeek: {
         next: (mgr, state) => {
             if (mgr.getVisible(state.action.fl)) {
-                return 0.5 > mgr.getDistance(state.action.fl) // мяч далеко?
+                return 1 > mgr.getDistance(state.action.fl) // мяч далеко?
                     ? "closeBall" // близко
                     : "farGoal" // далеко
             } else {
@@ -126,6 +126,12 @@ const DT = {
             mgr.getVisible(state.action.goal)
                 ? {angle, v} = mgr.kickBallVisible(state.action.goal)
                 : {angle, v} = mgr.kickBallInVisible(state.action.goal, is_last_turn(state))
+            if (!angle) {
+                angle = 0
+            }
+            if (!v) {
+                v = 20
+            }
             state.command = {n: "kick", v: v, a: angle}
             state.commands_queue.enqueueFront({act: 'cmd', cmd: {n: "turn", v: angle}})
             return "sendCommand"

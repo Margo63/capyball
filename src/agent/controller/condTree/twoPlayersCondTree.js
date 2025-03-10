@@ -54,7 +54,12 @@ const DT_TwoPlayers = {
                     ? "closeFlag"
                     : "farGoal"
             } else {
-                return "rotateToGoal"
+                const visibleTeammatesCount = mgr.getVisibleTeammatesCount();
+                if (visibleTeammatesCount === 0) {
+                    // Если нет, ищём хоть что-то
+                    return "rotateToGoal"
+                }
+                return "handleClosestTeammate";
             }
         }
     },
@@ -68,14 +73,10 @@ const DT_TwoPlayers = {
     },
     farGoal: {
         next: (mgr, state) => {
-            const visibleTeammatesCount = mgr.getVisibleTeammatesCount();
-            if (visibleTeammatesCount === 0) {
-                // Если нет видимых игроков, используем дерево движения по флагам
-                return mgr.getAngle(state.action.fl) > Math.min(30, mgr.getDistance(state.action.fl) * 2)
-                    ? "rotateToGoal"
-                    : "runToGoal"
-            }
-            return "handleClosestTeammate";
+            // Если нет видимых игроков, используем дерево движения по флагам
+            return mgr.getAngle(state.action.fl) > Math.min(30, mgr.getDistance(state.action.fl) * 2)
+                ? "rotateToGoal"
+                : "runToGoal"
         }
     },
     rotateToGoal: {
@@ -102,7 +103,12 @@ const DT_TwoPlayers = {
                     ? "closeBall"
                     : "farGoal"
             } else {
-                return "rotateFixAngle"
+                const visibleTeammatesCount = mgr.getVisibleTeammatesCount();
+                if (visibleTeammatesCount === 0) {
+                    // Если нет, ищём хоть что-то
+                    return "rotateFixAngle"
+                }
+                return "handleClosestTeammate";
             }
         },
     },
@@ -133,12 +139,10 @@ const DT_TwoPlayers = {
             if (state.closestTeammate !== closestTeammate) {
                 state.closestTeammate = closestTeammate;    // Сохраняем ближайшего игрока в состоянии
 
-                let message = `obeyed_${mgr.id}_${state.closestTeammate.cmd.p[2]}`
-                state.commands_queue.enqueueFront({act: 'cmd', cmd: {n: "say", v: message}})
+                //let message = `obeyed_${mgr.id}_${state.closestTeammate.cmd.p[2]}`
+                // state.commands_queue.enqueueFront({act: 'cmd', cmd: {n: "say", v: message}})
 
             }
-
-
         },
         next: (mgr, state) => {
             const dist = state.closestTeammate.p[0];
