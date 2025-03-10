@@ -1,5 +1,6 @@
 const {getEnemyGoal, getMyGoal, FLAGS} = require("../utils/constants");
 const {getTurnAngle, isGoal} = require("../utils/actUtils");
+const {distance} = require("../utils/locationUtils");
 
 class Manager {
 
@@ -39,13 +40,33 @@ class Manager {
     }
 
     getDistance(fl) {
-        return this.getP(fl).p[0]
+        if (this.getVisible(fl)) {
+            return this.getP(fl).p[0]
+        } else {
+            console.log(this.agent)
+            return distance(this.agent, FLAGS[fl])
+        }
     }
 
     getAngle(fl) {
         return this.getP(fl).p[1]
     }
 
+    hardGoToObject(fl) {
+        let angle
+        let v = 100
+        if (this.getVisible(fl)) {
+            angle = this.getAngle(fl)
+        } else {
+            if (FLAGS[fl]) {
+                angle = getTurnAngle(this.agent.x, this.agent.y, FLAGS[fl].x, FLAGS[fl].y, this.agent.angleRad)
+            } else {
+                v = 90
+                angle = 45
+            }
+        }
+        return {v: v, angle: angle}
+    }
 
     kickBallVisible(fl) {
         const index = this.getIndex(fl)
@@ -55,7 +76,7 @@ class Manager {
         } else {
             let minus_speed = this.labels.all_labels[index].p[0]
             // уменьшение скорости на minus_speed для того, чтобы не кидать на большие расстояния
-            v = Math.max(100 - minus_speed, 15)
+            v = Math.max(100 - minus_speed, 20)
         }
         angle = this.labels.all_labels[index].p[1]
         return {v: v, angle: angle}
@@ -77,7 +98,7 @@ class Manager {
         }
     }
 
-    isNearGates(){
+    isNearGates() {
         let myGoal = getMyGoal(this.position)
         let isVisible = this.getVisible(myGoal.name)
         console.log(isVisible, myGoal, getMyGoal(this.position))

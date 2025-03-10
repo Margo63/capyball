@@ -66,11 +66,8 @@ class Agent {
     sendCmd() {
         if (this.controller.run) { // Игра начата
             if (this.act) { // Есть команда от игрока
-                if (this.act.n === "kick") // Пнуть мяч
-                    this.socketSend(this.act.n, this.act.v + " "+ this.act.a)
-                else // Движение и поворот
-                    this.socketSend(this.act.n, this.act.v)
-                //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACT", this.act)
+                this.socketSend(this.act.n, this.act.v + (this.act.a ? " " + this.act.a : ""))
+                console.log(this.act.n, this.act.v + (this.act.a ? " " + this.act.a : ""))
             }
             this.act = null // reset comand
             //this.socketSend("turn", `${this.speed}`) //every time turn after game start
