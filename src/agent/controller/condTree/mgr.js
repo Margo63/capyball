@@ -25,7 +25,7 @@ class Manager {
             let current_title = title
 
             while (current_title !== dt.terminate_command) {
-                console.log(current_title)
+                //console.log(current_title)
                 const action = dt[current_title]
                 if (typeof action.exec == "function") {
                     action.exec(manager, dt.state)
@@ -46,7 +46,7 @@ class Manager {
         if (this.getVisible(fl)) {
             return this.getP(fl).p[0]
         } else {
-            console.log(this.agent)
+            //console.log(this.agent)
             return distance(this.agent, FLAGS[fl])
         }
     }
@@ -76,13 +76,13 @@ class Manager {
     }
 
     getVisibleTeammates() {
-        console.log(this.labels.p_labels[0] ? this.labels.p_labels[0].cmd.p : "", this.team_name)
+        //console.log(this.labels.p_labels[0] ? this.labels.p_labels[0].cmd.p : "", this.team_name)
         const teammates = this.labels.p_labels.filter(player => {
-            console.log(player.cmd.p[1])
+            //console.log(player.cmd.p[1])
             return player.cmd.p[1] === '"' + this.team_name + '"'; // Проверяем название команды
 
         });
-        console.log(teammates)
+        //console.log(teammates)
         return teammates;
     }
 

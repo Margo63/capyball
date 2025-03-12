@@ -74,6 +74,14 @@ class LocationUtils {
         }
         return {x: predictXY.x, y: predictXY.y, team: enemy_p.cmd.p[1]}
     }
+    static getBallCoord(ball, agentCoords) {
+        let predictXY = LocationUtils.predict(agentCoords.x, agentCoords.y, ball.p[0], MathUtils.toRadians(ball.p[1]))
+
+        // if (needLog) {
+        //     console.log("MY ENEMY", {x: predictXY.x, y: predictXY.y, team: ball.cmd.p[1]})
+        // }
+        return {x: predictXY.x, y: predictXY.y}
+    }
 
     /** НЕ ВСЕГДА РАБОТАЕТ ВЕРНО - НАДО ОТЛАЖИВАТЬ
      * Вычисляет угол объекта на основе его координат и видимых объектов.

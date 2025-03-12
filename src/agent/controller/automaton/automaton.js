@@ -187,3 +187,4 @@ const TA = {
             } //ПУстое действие
         }
 }
+module.exports = TA

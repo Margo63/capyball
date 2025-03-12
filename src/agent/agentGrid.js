@@ -70,7 +70,7 @@ class Agent {
                 console.log(this.act.n, this.act.v + (this.act.a ? " " + this.act.a : ""))
             }
             this.act = null // reset comand
-            //this.socketSend("turn", `${this.speed}`) //every time turn after game start
+            //this.socketSend("turn", `20`) //every time turn after game start
         }
     }
 }

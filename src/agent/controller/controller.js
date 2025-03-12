@@ -1,5 +1,5 @@
 const {FLAGS, getEnemyGoal} = require('./utils/constants');
-
+const Manager_ta = require('./automaton/manager')
 const Manager = require('./condTree/mgr');
 const {toRadians} = require('./utils/mathUtils');
 const {getEnemyInfo, getAgentBestCoordinates} = require('./utils/locationUtils');
@@ -7,7 +7,8 @@ const CommandQueue = require("./commandQueue");
 const {getTurnAngle, isGoal} = require("./utils/actUtils");
 
 class Controller {
-    constructor(DT, teamName) {
+
+    constructor(DT, TA,teamName,side="l") {
         this.act = null
         this.last_act = null
         this.speed = 100
@@ -16,8 +17,10 @@ class Controller {
         this.run = false
         this.position = null
         this.team_name = teamName
+        this.side = side
         this.id = null
         this.DT = DT
+        this.TA = TA
         this.debug = false
         this.mgr = new Manager(this.team_name)
     }
@@ -79,7 +82,8 @@ class Controller {
 
     evaluateHear(msg, p) {
         if (this.debug) console.log(msg, p)
-        console.log("IM HERERE", msg, p)
+        if (this.debug) console.log("IM HERERE", msg, p)
+        Manager_ta.setHear(p)
         switch (p[2]) {
             case "play_on":
                 this.run = true
@@ -108,7 +112,7 @@ class Controller {
 
                 } else if (p[2].startsWith('"obeyed_')) {
                     const message = p[2].replace(/"/g, ''); // Удаляем кавычки
-                    console.log(p[2])
+                    if (this.debug) console.log(p[2])
                     // Парсинг сообщения "reached fct"
                     const flag = message.split("_")[1]; // Получаем флаг из сообщения
 
@@ -193,14 +197,16 @@ class Controller {
     }
 
     executeAct(labels) {
-        this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.id)
+        //Manager_ta.setHear([labels, this.my_coord])
+        this.act = Manager_ta.getAction([labels, this.my_coord], this.TA, this.team_name, this.side)
+        //this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.id)
     }
 
     handleReachedFlag(flag) {
         let queue = this.DT.state.commands_queue
-        console.log(!queue.isEmpty(), queue.peek().act === "flag", queue.peek().fl === flag)
+        if (this.debug) console.log(!queue.isEmpty(), queue.peek().act === "flag", queue.peek().fl === flag)
         if (!queue.isEmpty() && queue.peek().act === "flag" && queue.peek().fl === flag) {
-            console.log("HEEREEE")
+            //console.log("HEEREEE")
             queue.dequeue()
         }
     }
