@@ -67,7 +67,7 @@ class Agent {
         if (this.controller.run) { // Игра начата
             if (this.act) { // Есть команда от игрока
                 this.socketSend(this.act.n, this.act.v + (this.act.a ? " " + this.act.a : ""))
-                console.log(this.act.n, this.act.v + (this.act.a ? " " + this.act.a : ""))
+                //console.log(this.act.n, this.act.v + (this.act.a ? " " + this.act.a : ""))
             }
             this.act = null // reset comand
             //this.socketSend("turn", `20`) //every time turn after game start

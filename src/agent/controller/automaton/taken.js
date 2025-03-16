@@ -72,20 +72,7 @@ Taken = {
         }
 
         if(side === "l"){
-            this.goal = {
-                x: FLAGS["gr"].x,
-                y: FLAGS["gr"].y,
-                f:"gr",
-            }
-            const index = see.constant_labels.findIndex(function(label) {
-                return label.fl === "gr"
-            });
-            if(index !==-1){
-                this.goal.dist = see.constant_labels[index].distance
-                this.goal.angle = see.constant_labels[index].angle
-            }
-        }else{
-            this.goal = {
+            this.goalOwn = {
                 x: FLAGS["gl"].x,
                 y: FLAGS["gl"].y,
                 f:"gl",
@@ -94,9 +81,49 @@ Taken = {
                 return label.fl === "gl"
             });
             if(index !==-1){
-                this.goal.dist = see.constant_labels[index].distance
-                this.goal.angle = see.constant_labels[index].angle
+                this.goalOwn.dist = see.constant_labels[index].distance
+                this.goalOwn.angle = see.constant_labels[index].angle
             }
+
+            // this.goal = {
+            //     x: FLAGS["gr"].x,
+            //     y: FLAGS["gr"].y,
+            //     f:"gr",
+            // }
+            // const index_enemy = see.constant_labels.findIndex(function(label) {
+            //     return label.fl === "gr"
+            // });
+            // if(index_enemy !==-1){
+            //     this.goal.dist = see.constant_labels[index_enemy].distance
+            //     this.goal.angle = see.constant_labels[index_enemy].angle
+            // }
+
+        }else{
+            this.goalOwn = {
+                x: FLAGS["gr"].x,
+                y: FLAGS["gr"].y,
+                f:"gr",
+            }
+            const index = see.constant_labels.findIndex(function(label) {
+                return label.fl === "gr"
+            });
+            if(index !==-1){
+                this.goalOwn.dist = see.constant_labels[index].distance
+                this.goalOwn.angle = see.constant_labels[index].angle
+            }
+
+            // this.goal = {
+            //     x: FLAGS["gl"].x,
+            //     y: FLAGS["gl"].y,
+            //     f:"gl",
+            // }
+            // const index_enemy = see.constant_labels.findIndex(function(label) {
+            //     return label.fl === "gl"
+            // });
+            // if(index_enemy !==-1){
+            //     this.goal.dist = see.constant_labels[index_enemy].distance
+            //     this.goal.angle = see.constant_labels[index_enemy].angle
+            // }
         }
 
         //console.log(this.goal)

@@ -1,11 +1,11 @@
 const TA = {
-    current: "start", // Текущее состояние автомата
+    current: "kick", // Текущее состояние автомата
     state: { // Описание состояния
         variables: {dist: null}, // Переменные
         timers: {t: 0}, // Таймеры
         next: true, // Нужен переход на следующее состояние
         synch: undefined, // Текущее Действие
-        local: {}, // Внутренние переменные Для методов
+        local: {seeGoal: false}, // Внутренние переменные Для методов
     },
     nodes: { /* УЗЛЫ автомата, в каждом узле: имя и узлы, на которые есть переходы */
         start: {n: "start", e: ["close", "near", "far"]},
@@ -78,9 +78,14 @@ const TA = {
             },
             beforeAction(taken, state) {
 // Действие перед каждым вычислением
-                //console.log(taken.ball)
+                //console.log(taken.goalOwn)
                 if (taken.ball) state.variables.dist = taken.ball.dist
-                else if(taken.goalOwn) state.variables.dist = taken.goalOwn.dist
+                else if (taken.goalOwn.dist) state.variables.dist = taken.goalOwn.dist
+                // else {
+                //     console.log()
+                //     return this.goBack(taken, state)
+                // }
+
             },
             catch(taken, state) { // Ловим мяч
                 if (!taken.ball) {
@@ -119,9 +124,10 @@ const TA = {
                 return {n: "kick", v: "10 45"}
             },
             goBack(taken, state) { // Возврат к воротам
+                console.log(taken.goalOwn)
                 state.next = false
                 let goalOwn = taken.goalOwn
-                if (!goalOwn) return {n: "turn", v: 60}
+                if (!goalOwn.dist) return {n: "turn", v: 60}
                 if (Math.abs(goalOwn.angle) > 10)
                     return {n: "turn", v: goalOwn.angle}
                 if (goalOwn.dist < 2) {
@@ -133,6 +139,7 @@ const TA = {
             lookAround: function (taken, state) { // Осматриваемся
                 state.next = false
                 state.synch = "lookAround!"
+                //return {n: "turn", v: 90}
                 if (!state.local.look)
                     state.local.look = "left"
                 switch (state.local.look) {

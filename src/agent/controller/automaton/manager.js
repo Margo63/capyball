@@ -14,7 +14,7 @@ const Manager = {
         return this.execute(taken, ta)
     },
     incTimers(taken, ta) { // УВеличение таймеров
-        //console.log("inc timer")
+        //console.log("inc timer"+this.lastTime)
         if (!this.lastTime)
             this.lastTime = 0
         if (taken.time > this.lastTime) {
@@ -39,8 +39,9 @@ const Manager = {
     },
 
     nextState(taken, ta) { // Находимся в узле, нужен переход
-        //console.log("next stage")
+
         let node = ta.nodes[ta.current]
+        //console.log(ta.current)
         for (let name of node.e) { // Перебираем ребра
             let edgeName = `${node.n}_${name}`
             let edge = ta.edges[edgeName]
@@ -151,14 +152,21 @@ const Manager = {
 
 
         function lt(ta, l, r) { // Проверка неравенства
+            //console.log(taStateObject(l, ta))
+           // console.log(taStateObject(r, ta))
+            if(taStateObject(l, ta) === null) return false
+            if(taStateObject(r, ta) === null) return false
             return taStateObject(l, ta) < taStateObject(r, ta)
         }
         function lte(ta, l, r) { // Проверка неравенства
+            //console.log(taStateObject(l, ta))
+            //console.log(taStateObject(r, ta))
+            if(taStateObject(l, ta) === null) return false
+            if(taStateObject(r, ta) === null) return false
             return taStateObject(l, ta) <= taStateObject(r, ta)
         }
 
         //TODO ПРоверка условий
-
         //throw `Unexpected guard:${JSON.stringify(g)}`
         if(g.s === "lt")
             return lt(ta, g.l, g.r)
