@@ -1,5 +1,5 @@
 const TA = {
-    current: "kick", // Текущее состояние автомата
+    current: "start", // Текущее состояние автомата
     state: { // Описание состояния
         variables: {dist: null}, // Переменные
         timers: {t: 0}, // Таймеры

@@ -41,7 +41,7 @@ const Manager = {
     nextState(taken, ta) { // Находимся в узле, нужен переход
 
         let node = ta.nodes[ta.current]
-        //console.log(ta.current)
+        console.log(ta.current)
         for (let name of node.e) { // Перебираем ребра
             let edgeName = `${node.n}_${name}`
             let edge = ta.edges[edgeName]

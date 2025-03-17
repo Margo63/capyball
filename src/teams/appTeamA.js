@@ -11,4 +11,4 @@ let controller = new Controller(DT,TA, teamName, "l");
 let agent1 = new Agent(controller); // Создание экземпляра агента-15
 require('../serverCommunication/socket')(agent1, teamName, VERSION) //Настройка сокета
 
-agent1.socketSend("move", `-20 0`)
+agent1.socketSend("move", `-50 0`)
