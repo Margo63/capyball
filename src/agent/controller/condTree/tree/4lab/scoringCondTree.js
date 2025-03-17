@@ -107,7 +107,7 @@ const DT = {
     farGoal: {
         next: (mgr, State) => {
             return mgr.getAngle(State.action.fl)
-            > Math.min(30, mgr.getDistance(State.action.fl) * 2)  // большой угол
+            > Math.min(15, mgr.getDistance(State.action.fl) * 2)  // большой угол
                 ? "rotateToGoal" // поворачиваемся
                 : "runToGoal" // бежим к цели
         }
