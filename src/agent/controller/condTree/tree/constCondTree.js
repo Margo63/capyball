@@ -1,6 +1,6 @@
-const CommandQueue = require("../commandQueue");
-const {getEnemyGoal} = require("../utils/constants");
-const FL = "flag", KI = "kick", CMD = "cmd"
+const CommandQueue = require("../../commandQueue");
+const {getEnemyGoal} = require("../../utils/constants");
+const {FL, KI, CMD, root_exec, handleReachedFlag} = require("./utils/condTreeUtils");
 
 const DT = {
     terminate_command: "sendCommand",
@@ -29,22 +29,23 @@ const DT = {
         prev_command: null, // предыдущая
         action: null // текущее действие
     },
-    root: {
-        exec(mgr, state) {
-            if (state.commands_queue.isEmpty()) {
-                console.log("Query is empty")
-                // как только придёт новая цель - он переключится на неё. А пока пусть бегает за мячиком
-                state.action = {act: KI, fl: "b", goal: getEnemyGoal(mgr.position)}
+    root: {processCmd(mgr, state, cmd) {
+            if(cmd ==="win_goal"){
+                let currentCommand = state.commands_queue.peek()
+                if (currentCommand && currentCommand.act === 'kick') {
+                    state.commands_queue.dequeue()
+                }
+            }
+            if (cmd.startsWith('"reached_')) {
+                const message = cmd.replace(/"/g, ''); // Удаляем кавычки
+                console.log(cmd)
+                const flag = message.split("_")[1]; // Получаем флаг из сообщения
+                handleReachedFlag(flag, state);
                 return
             }
-            state.action = state.commands_queue.peek();
-            state.prev_command = state.command
-            if (state.action.act === CMD) {
-                state.commands_queue.dequeue();
-                state.command = state.action.cmd
-            } else {
-                state.command = null
-            }
+        },
+        exec(mgr, state) {
+            root_exec(mgr, state, {act: KI, fl: "b", goal: getEnemyGoal(mgr.position)})
         },
         next: (mgr, state) => {
             switch (state.action.act) {
@@ -54,9 +55,11 @@ const DT = {
                     return "ballSeek"
                 case CMD:
                     return "sendCommand"
-                default:
+                default: {
                     console.log("Unknown act", state.action.act)
-
+                    state.commands_queue.dequeue()
+                    return "root"
+                }
             }
         }
     },

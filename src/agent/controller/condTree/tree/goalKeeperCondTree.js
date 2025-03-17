@@ -1,6 +1,8 @@
-const CommandQueue = require("../commandQueue");
-const {getEnemyGoal, getMyGoal} = require("../utils/constants");
-const FL = "flag", KI = "kick", CMD = "cmd", GT = "gate", PR = "protect"
+const CommandQueue = require("../../commandQueue");
+const {getEnemyGoal, getMyGoal} = require("../../utils/constants");
+const {ball} = require("../../utils/constants")
+
+const {FL, KI, CMD, TR, GT, PR, root_exec, handleReachedFlag} = require("./utils/condTreeUtils");
 
 const DT_Goalkeeper = {
     terminate_command: "sendCommand",
@@ -9,26 +11,29 @@ const DT_Goalkeeper = {
         commands_queue: new CommandQueue(
             {act: "gate"}, // Занимаем позицию в воротах
             {act: "protect", fl: "b"} // Отбиваем мяч
-        ), command: null, prev_command: null, // Предыдущая команда
+        ),
+        command: null,
+        prev_command: null, // Предыдущая команда
         action: null, // Текущее действие
-
     },
     root: {
+        processCmd(mgr, state, cmd) {
+            if (cmd === "win_goal") {
+                let currentCommand = state.commands_queue.peek()
+                if (currentCommand && currentCommand.act === 'kick') {
+                    state.commands_queue.dequeue()
+                }
+            }
+            if (cmd.startsWith('"reached_')) {
+                const message = cmd.replace(/"/g, ''); // Удаляем кавычки
+                console.log(cmd)
+                const flag = message.split("_")[1]; // Получаем флаг из сообщения
+                handleReachedFlag(flag, state);
+                return
+            }
+        },
         exec(mgr, state) {
-            if (state.commands_queue.isEmpty()) {
-                console.log("Query is empty");
-                // Если очередь пуста, вратарь просто следит за мячом
-                state.action = {act: "protect", fl: "b"};
-                return;
-            }
-            state.action = state.commands_queue.peek();
-            state.prev_command = state.command;
-            if (state.action.act === CMD) {
-                state.commands_queue.dequeue();
-                state.command = state.action.cmd;
-            } else {
-                state.command = null;
-            }
+            root_exec(mgr, state, {act: "gate"})
         },
         next: (mgr, state) => {
             switch (state.action.act) {
@@ -38,9 +43,12 @@ const DT_Goalkeeper = {
                     return "checkPosition"
                 case CMD:
                     return "sendCommand"
-                default:
-                    console.log("Unknown act", state.action.act)
-
+                default: {
+                    console.log("Unknown act", state.action.act, state.commands_queue)
+                    state.commands_queue.dequeue()
+                    console.log("Unknown act", state.action.act, state.commands_queue)
+                    return "root"
+                }
             }
         }
     },
@@ -152,5 +160,5 @@ const DT_Goalkeeper = {
 };
 const is_last_kick = (state) => state.prev_command && state.prev_command.n === 'kick'
 
-const ball = "b"
+
 module.exports = DT_Goalkeeper;

@@ -66,6 +66,7 @@ class Constants {
 
     }
     // static borders = {x_min: -57.5, y_min: -30, x_max: 57.5, y_max: 30}
+    static ball = "b"
 
     static getMyGoal(team) {
         switch (team) {

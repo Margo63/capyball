@@ -1,13 +1,15 @@
 const Agent = require('../agent/agentGrid')
-//const DT = require('../agent/controller/condTree/constCondTree');
-const DT = require('../agent/controller/condTree/twoPlayersCondTree');
+const DT_PASSER = require('../agent/controller/condTree/tree/4lab/passerCondTree');
+const DT_SCORING = require('../agent/controller/condTree/tree/4lab/scoringCondTree');
+//const DT = require('../agent/controller/condTree/twoPlayersCondTree');
 //const DT = require('../agent/controller/condTree/goalKeeperCondTree');
 const Controller = require('../agent/controller/controller')
 const VERSION = 7 // Версия сервера
 let teamName = "teamA" // Имя команды
 
-let controller = new Controller(DT, teamName);
-let agent1 = new Agent(controller); // Создание экземпляра агента-15
-require('../serverCommunication/socket')(agent1, teamName, VERSION) //Настройка сокета
 
-agent1.socketSend("move", `-1 -20`)
+let controller1 = new Controller(DT_SCORING, teamName);
+let agent2 = new Agent(controller1); // Создание экземпляра агента-15
+require('../serverCommunication/socket')(agent2, teamName, VERSION) //Настройка сокета
+
+agent2.socketSend("move", `-10 -20`)

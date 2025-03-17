@@ -1,5 +1,6 @@
-const CommandQueue = require("../commandQueue");
-const {getEnemyGoal} = require("../utils/constants");
+const CommandQueue = require("../../commandQueue");
+const {getEnemyGoal} = require("../../utils/constants");
+const {handleReachedFlag} = require("./utils/condTreeUtils");
 const FL = "flag", KI = "kick", CMD = "cmd"
 
 const DT_TwoPlayers = {
@@ -19,6 +20,21 @@ const DT_TwoPlayers = {
         closestTeammate: null // мой лидер
     },
     root: {
+        processCmd(mgr, state, cmd) {
+            if (cmd === "win_goal") {
+                let currentCommand = state.commands_queue.peek()
+                if (currentCommand && currentCommand.act === 'kick') {
+                    state.commands_queue.dequeue()
+                }
+            }
+            if (cmd.startsWith('"reached_')) {
+                const message = cmd.replace(/"/g, ''); // Удаляем кавычки
+                console.log(cmd)
+                const flag = message.split("_")[1]; // Получаем флаг из сообщения
+                handleReachedFlag(flag, state);
+                return
+            }
+        },
         exec(mgr, state) {
             if (state.commands_queue.isEmpty()) {
                 console.log("Query is empty")

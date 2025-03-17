@@ -78,46 +78,30 @@ class Controller {
     }
 
     evaluateHear(msg, p) {
+        let processDTCmd = (cmd) => this.DT.root.processCmd(this.mgr, this.DT.state, cmd)
         if (this.debug) console.log(msg, p)
         console.log("IM HERERE", msg, p)
         switch (p[2]) {
             case "play_on":
-                this.run = true
-                if (this.debug) console.log("PLAY WAS STARTED!")
+                if (!this.run) {
+                    this.run = true
+                    processDTCmd(p[2])
+                    if (this.debug) console.log("PLAY WAS STARTED!")
+                }
                 break
             default:
                 let isGoalMessage = isGoal(p[2], this.position)
                 if (isGoalMessage) {
-                    if (this.debug) console.log("GOOAL!!!")
+                    this.run = false
                     if (isGoalMessage.win) {
-                        let currentCommand = this.DT.state.commands_queue.peek()
-                        if (currentCommand && currentCommand.act === 'kick') {
-                            this.DT.state.commands_queue.dequeue()
-                        }
+                        if (this.debug) console.log("GOOAL!!!")
+                        processDTCmd("win_goal")
                     } else if (this.debug) {
                         console.log("GOAL...SAD...")
                     }
-                } else if (p[2].startsWith('"reached_')) {
-                    const message = p[2].replace(/"/g, ''); // Удаляем кавычки
-                    console.log(p[2])
-                    // Парсинг сообщения "reached fct"
-                    const flag = message.split("_")[1]; // Получаем флаг из сообщения
-
-                    if (this.debug) console.log(`Reached flag: ${flag}`);
-                    this.handleReachedFlag(flag);
-
-                } else if (p[2].startsWith('"obeyed_')) {
-                    const message = p[2].replace(/"/g, ''); // Удаляем кавычки
-                    console.log(p[2])
-                    // Парсинг сообщения "reached fct"
-                    const flag = message.split("_")[1]; // Получаем флаг из сообщения
-
-                    if (this.debug) console.log(`Obeyed to: ${flag}`);
-                    // Здесь можно добавить дополнительную логику для обработки флага
-                    this.handleReachedFlag(flag);
-
+                } else {
+                    processDTCmd(p[2])
                 }
-
         }
 
     }
@@ -194,15 +178,6 @@ class Controller {
 
     executeAct(labels) {
         this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.id)
-    }
-
-    handleReachedFlag(flag) {
-        let queue = this.DT.state.commands_queue
-        console.log(!queue.isEmpty(), queue.peek().act === "flag", queue.peek().fl === flag)
-        if (!queue.isEmpty() && queue.peek().act === "flag" && queue.peek().fl === flag) {
-            console.log("HEEREEE")
-            queue.dequeue()
-        }
     }
 }
 
