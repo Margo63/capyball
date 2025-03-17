@@ -154,7 +154,7 @@ const DT = {
             const dist = teammate.p[0];
             const angle = teammate.p[1];
 
-            let kick_strength = Math.min(95, Math.floor(dist * 4))
+            let kick_strength = Math.min(50, Math.floor(dist * 4))
             let kick_angle = Math.max(angle);
 
             state.command = {n: "kick", v: kick_strength + " " + kick_angle};
