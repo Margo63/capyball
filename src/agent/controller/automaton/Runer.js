@@ -101,7 +101,7 @@ const TA = {
                     }
                     angle = taken.goal.angle
                     console.log(v)
-                    return {n: "kick", v: v, a: angle}
+                    return {n: "kick", v: 100, a: angle}
 
                 }else{
                     return {n: "kick", v: 20, a: 45}
@@ -164,7 +164,7 @@ const TA = {
                 state.next = false
                 let ball = taken.ball
                 //console.log(ball)
-                if (!ball) return //{n: "turn", v: 45}
+                if (!ball) return {n: "turn", v: 45}
                 if (ball.dist <= 0.5) {
                     state.next = true
                     return

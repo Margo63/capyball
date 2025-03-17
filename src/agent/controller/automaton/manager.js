@@ -110,13 +110,18 @@ const Manager = {
             }
             if (e.assign) { // Есть назначения в ребре
                 for (let a of e.assign) {
-                    if (a.type == "timer") { // ДЛя таймеров
-                        if (!ta.state.timers[a.n])
-                            throw `Unexpected timer:${а}`
+                    if (a.type === "timer") { // ДЛя таймеров
+                        console.log(ta.state)
+
+                        // if (!ta.state.timers[a.n]){
+                        //     console.log(a)
+                        //     throw `Unexpected timer:${a}`
+                        // }
+
                         ta.state.timers[a.n] = a.v
                     } else { // ДЛя переменных
                         if (!ta.state.variables[a.n])
-                            throw `Unexpected variable: ${а}`
+                            throw `Unexpected variable: ${a}`
                         ta.state.variables[a.n] = a.v
                     }
                 }
