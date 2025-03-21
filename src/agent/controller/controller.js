@@ -1,6 +1,8 @@
 const {FLAGS, getEnemyGoal} = require('./utils/constants');
 const Manager_ta = require('./automaton/manager')
 const Manager = require('./condTree/mgr');
+const ctrl = require('./comand/control');
+
 const {toRadians} = require('./utils/mathUtils');
 const {getEnemyInfo, getAgentBestCoordinates} = require('./utils/locationUtils');
 const CommandQueue = require("./commandQueue");
@@ -8,7 +10,7 @@ const {getTurnAngle, isGoal} = require("./utils/actUtils");
 
 class Controller {
 
-    constructor(DT, TA,teamName,side="l") {
+    constructor(DT, TA,teamName,controllers,side="l") {
         this.act = null
         this.last_act = null
         this.speed = 100
@@ -23,6 +25,7 @@ class Controller {
         this.TA = TA
         this.debug = false
         this.mgr = new Manager(this.team_name)
+        this.controllers = controllers
     }
 
     reset_act() {
@@ -198,7 +201,9 @@ class Controller {
 
     executeAct(labels) {
         //Manager_ta.setHear([labels, this.my_coord])
-        this.act = Manager_ta.getAction([labels, this.my_coord], this.TA, this.team_name, this.side)
+        //this.act = Manager_ta.getAction([labels, this.my_coord], this.TA, this.team_name, this.side)
+        this.act = ctrl.execute([labels, this.my_coord],this.controllers)
+        //console.log(ctrl.execute([labels, this.my_coord],this.controllers))
         //this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.id)
     }
 
