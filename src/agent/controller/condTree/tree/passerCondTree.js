@@ -34,7 +34,7 @@ const DT = {
             if (input.isEnemySide) {
                 refresh_queue(state, state.init_commands, input.side)
             }
-            root_exec(state, {act: 'tree', to: "refresh"})
+            root_exec(state, {act: "kick", fl: ball})
             console.log("exec", state.commands_queue)
         },
         next: (input, state) => {

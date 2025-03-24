@@ -26,7 +26,7 @@ const slow_down_coefficient = 0.6;
 const DT = {
     terminate_command: "sendCommand",
     state: {
-        commands_queue: new CommandQueue({act: 'tree', to: "refresh"}),
+        commands_queue: new CommandQueue({act: "kick", fl: ball}),
         wait: 0,
         init_commands: [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}],
         prev_command: null, // Предыдущая команда
