@@ -22,7 +22,7 @@ const DT = {
         wait: 0,
     },
     root: {
-        processCmd(mgr, state, cmd) {
+        processCmd(input, state, cmd) {
             if (cmd === "play_on") {
                 state.commands_queue.enqueueFront({act: 'tree', to: "refresh"})
             }
@@ -30,11 +30,11 @@ const DT = {
                 state.commands_queue.enqueueFront({act: 'tree', to: "refresh"})
             }
         },
-        exec(mgr, state) {
-            root_exec(mgr, state, {act: "flag", fl: "fprc"})
+        exec(input, state) {
+            root_exec(input, state, {act: "flag", fl: "fprc"})
             console.log("exec", state.commands_queue)
         },
-        next: (mgr, state) => {
+        next: (input, state) => {
             switch (state.action.act) {
                 case CMD:
                     return "sendCommand"
@@ -57,7 +57,7 @@ const DT = {
         },
     },
     ballSeek: {
-        next: (mgr, state) => {
+        next: (input, state) => {
             if (!mgr.getVisible(state.action.fl)) {
                 return "rotate"; // поворачиваемся
             }
@@ -70,7 +70,7 @@ const DT = {
         }
     },
     flagSeek: {
-        next: (mgr, state) => {
+        next: (input, state) => {
             if (!mgr.getVisible(state.action.fl)) {
                 return "rotate"; // Иначе поворачиваемся
             }
@@ -83,10 +83,10 @@ const DT = {
         }
     },
     closeFlag: {
-        exec(mgr, state) {
+        exec(input, state) {
             state.action = state.commands_queue.dequeue();
         },
-        next: (mgr, state) => {
+        next: (input, state) => {
             if (state.commands_queue.isEmpty()) {
                 return "sendCommand"
             } else {
@@ -95,14 +95,14 @@ const DT = {
         },
     },
     rotate: {
-        exec(mgr, state) {
+        exec(input, state) {
             state.command = {n: "turn", v: rotation_speed}
         }
         ,
-        next: (mgr, state) => "sendCommand",
+        next: (input, state) => "sendCommand",
     },
     farGoal: {
-        next: (mgr, state) => {
+        next: (input, state) => {
             if (Math.abs(mgr.getAngle(state.action.fl)) > goal_angle) {
                 return "rotateToGoal"; // Если угол больше goalAngle, поворачиваем к цели
             } else {
@@ -111,19 +111,19 @@ const DT = {
         }
     },
     rotateToGoal: {
-        exec(mgr, state) {
+        exec(input, state) {
             state.command = {n: "turn", v: mgr.getAngle(state.action.fl)}
         },
-        next: (mgr, state) => "sendCommand",
+        next: (input, state) => "sendCommand",
     },
     runToGoal: {
-        exec(mgr, state) {
+        exec(input, state) {
             state.command = {n: "dash", v: Math.min(100, mgr.getDistance(state.action.fl) * 15)}
         },
-        next: (mgr, state) => "sendCommand",
+        next: (input, state) => "sendCommand",
     },
     assist: {
-        next: (mgr, state) => {
+        next: (input, state) => {
             if (mgr.getVisibleTeammatesCount() > 0) {
                 return "pass"; // Если видим игрока, передаем мяч
             } else {
@@ -132,7 +132,7 @@ const DT = {
         }
     },
     wait: {
-        next: (mgr, state) => {
+        next: (input, state) => {
             if (state.wait >= wait_time) {
                 return "findPlayer"; // Если время ожидания истекло, ищем игрока
             } else {
@@ -142,13 +142,13 @@ const DT = {
         }
     },
     findPlayer: {
-        exec(mgr, state) {
+        exec(input, state) {
             state.command = {n: "kick", v: `10 ${-30 - (Math.random() * 10) % 5}`}
         },
-        next: (mgr, state) => "sendCommand",
+        next: (input, state) => "sendCommand",
     },
     pass: {
-        exec(mgr, state) {
+        exec(input, state) {
             //let params = mgr.getAngleAndStrength(p);
             const teammate = mgr.getVisibleTeammate()
             const dist = teammate.p[0];
@@ -162,10 +162,10 @@ const DT = {
             state.commands_queue.enqueueFront({act: "cmd", cmd: {n: "say", v: "go"}})
 
         },
-        next: (mgr, state) => "sendCommand",
+        next: (input, state) => "sendCommand",
     },
     sendCommand: {
-        command: (mgr, state) => state.command,
+        command: (input, state) => state.command,
     },
 }
 module.exports = DT;

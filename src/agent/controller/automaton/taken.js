@@ -1,4 +1,4 @@
-const {getBallCoord, getPlayerInfo} = require('../utils/locationUtils');
+const {getBallCoord, getPlayerInfo, isMySide, isEnemySide} = require('../utils/locationUtils');
 const {distance} = require('../utils/mathUtils');
 const {getFlagInfo, getReverseSide, FLAGS} = require('../utils/constants');
 Taken = {
@@ -14,6 +14,8 @@ Taken = {
         this.agent = input.agent
         this.dt = input.dt
         this.start_coords = input.start_coords
+        this.isMySide = isMySide(this.agent, this.side)
+        this.isEnemySide = isEnemySide(this.agent, this.side)
         this.pos = {
             x: input.agent.x,
             y: input.agent.y
@@ -51,7 +53,7 @@ Taken = {
         if (see.p_labels.length > 0) {
             //console.log(see.p_labels)
             see.p_labels.forEach(function (player) {
-                const player_pos = getPlayerInfo(player,input.agent, false)
+                const player_pos = getPlayerInfo(player, input.agent, false)
                 const player_info = {
                     x: player_pos.x,
                     y: player_pos.y,

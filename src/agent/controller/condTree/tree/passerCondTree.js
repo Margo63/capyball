@@ -1,5 +1,5 @@
 const CommandQueue = require("../../commandQueue");
-const {getEnemyGoal} = require("../../utils/constants");
+const {getEnemyGoal, getMyGoal} = require("../../utils/constants");
 const {FL, KI, CMD, TR, root_exec, refresh_queue, handleReachedFlag} = require("./utils/condTreeUtils");
 const {ball} = require("../../utils/constants")
 const ctu = require("./utils/condTreeUtils")
@@ -7,7 +7,7 @@ const ctu = require("./utils/condTreeUtils")
 const rotation_speed = 30;
 const goal_angle = 3;
 const flag_closeness = 3;
-const ball_closeness = 0.5;
+const ball_closeness = 1;
 const speed = 100;
 const wait_time = 15;
 const slowDownDistance = 3;
@@ -31,7 +31,10 @@ const DT = {
             }
         },
         exec(input, state) {
-            root_exec(state, {act: "flag", fl: "fprc"})
+            if (input.isEnemySide) {
+                refresh_queue(state, state.init_commands, input.side)
+            }
+            root_exec(state, {act: 'tree', to: "refresh"})
             console.log("exec", state.commands_queue)
         },
         next: (input, state) => {
@@ -124,6 +127,17 @@ const DT = {
     },
     assist: {
         next: (input, state) => {
+
+            let enemy_goal = getEnemyGoal(input.side)
+            if (ctu.getVisible(enemy_goal.name, input.see)) {
+                state.command = {n: "kick", v: 100, a: ctu.getAngle(enemy_goal.name, input.see)}; // Бьем по воротам
+                return
+            }
+            let my_goal = getMyGoal(input.side)
+            if (ctu.getVisible(my_goal.name, input.see)) {
+                state.command = {n: "kick", v: 100, a: -ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
+                return;
+            }
             if (ctu.getVisibleTeammatesCount(input.see, input.team_name) > 0) {
                 return "pass"; // Если видим игрока, передаем мяч
             } else {
@@ -143,7 +157,36 @@ const DT = {
     },
     findPlayer: {
         exec(input, state) {
-            state.command = {n: "kick", v: `10 ${-30 -(Math.random() * 10) % 5}`}
+            state.command
+            if (input.canKick) {
+                let enemy_goal = getEnemyGoal(input.side)
+                if (ctu.getVisible(enemy_goal.name, input.see)) {
+                    state.command = {n: "kick", v: 100, a: ctu.getAngle(enemy_goal.name, input.see)}; // Бьем по воротам
+                    return
+                }
+                let my_goal = getMyGoal(input.side)
+                if (ctu.getVisible(my_goal.name, input.see)) {
+                    state.command = {n: "kick", v: 100, a: -ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
+                    return;
+                }
+                if (ctu.getVisible("ft0", input.see)) {
+                    state.command = {n: "kick", v: 100, a: ctu.getAngle("ft0", input.see)}
+                    return;
+                }
+                if (ctu.getVisible("fb0", input.see)) {
+                    state.command = {n: "kick", v: 100, a: ctu.getAngle("fb0", input.see)}
+                    return
+                }
+                if (ctu.getVisible("fg" + input.side + 't', input.see)) {
+                    state.command = {n: "kick", v: 100, a: -180}
+                    return;
+                }
+                if (ctu.getVisible("fg" + input.side + 'b', input.see)) {
+                    state.command = {n: "kick", v: 100, a: -180}
+                    return;
+                }
+                state.command = {n: "kick", v: 100, a: -ctu.getAngle(ball, input.see)}; // Отбиваем мяч
+            }
         },
         next: (input, state) => "sendCommand",
     },
@@ -153,8 +196,8 @@ const DT = {
             const dist = teammate.p[0];
             const angle = teammate.p[1];
 
-            let kick_strength = Math.min(50, Math.floor(dist * 4))
-            let kick_angle = Math.max(angle);
+            let kick_strength = Math.max(50, Math.floor(dist))
+            let kick_angle = Math.min(angle);
 
             state.command = {n: "kick", v: kick_strength + " " + kick_angle};
             state.commands_queue.dequeue()

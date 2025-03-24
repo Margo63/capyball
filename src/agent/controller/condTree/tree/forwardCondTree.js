@@ -1,13 +1,23 @@
 const CommandQueue = require("../../commandQueue");
 const {getEnemyGoal} = require("../../utils/constants");
-const {FL, KI, CMD, TR, root_exec, refresh_queue, handleReachedFlag} = require("./utils/condTreeUtils");
+const {
+    FL,
+    KI,
+    CMD,
+    TR,
+    root_exec,
+    refresh_queue,
+    handleReachedFlag,
+    TM,
+    is_last_turn
+} = require("./utils/condTreeUtils");
 const {ball} = require("../../utils/constants")
 const ctu = require("./utils/condTreeUtils")
 
 const rotation_speed = 30;
 const goal_angle = 3;
 const flag_closeness = 3;
-const ball_closeness = 0.5;
+const ball_closeness = 1;
 const speed = 100;
 const wait_time = 15;
 const slowDownDistance = 3;
@@ -18,7 +28,9 @@ const DT = {
     state: {
         commands_queue: new CommandQueue({act: 'tree', to: "refresh"}),
         wait: 0,
-        init_commands: [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}]
+        init_commands: [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}],
+        prev_command: null, // Предыдущая команда
+        action: null, // Текущее действие
     },
     root: {
         processCmd(input, state, cmd) {
@@ -28,9 +40,16 @@ const DT = {
             if (cmd === "win_goal") {
                 state.commands_queue.enqueueFront({act: 'tree', to: "refresh"})
             }
+            if (cmd === '"go"') {
+                state.commands_queue.enqueueFront({act: "kick", fl: ball, goal: getEnemyGoal(input.side)})
+                return;
+            }
         },
         exec(input, state) {
-            root_exec(state, {act: "flag", fl: "fprc"})
+            if (input.isMySide) {
+                refresh_queue(state, state.init_commands, input.side)
+            }
+            root_exec(state, {act: 'tree', to: "refresh"})
             console.log("exec", state.commands_queue)
         },
         next: (input, state) => {
@@ -41,6 +60,8 @@ const DT = {
                     return 'flagSeek'
                 case KI:
                     return "ballSeek"
+                case TM:
+                    return "teammateSeek"
                 case TR:
                     if (state.action.to === "refresh") {
                         console.log("----------------- refresh --------------------")
@@ -51,37 +72,35 @@ const DT = {
                     }
                 default: {
                     console.log("Unknown act", state.action.act)
+                    state.commands_queue.dequeue()
                 }
             }
         },
     },
-    ballSeek: {
+    goalPath: {
         next: (input, state) => {
-            if (!ctu.getVisible(state.action.fl, input.see)) {
-                return "rotate"; // поворачиваемся
-            }
-            if (ball_closeness > ctu.getDistance(state.action.fl, input.see, input.agent)) {
-                return "assist"; // Если мяч близко, переходим в assist
+            if (ctu.getVisible(state.action.fl, input.see)) {
+                return "rootNext"; // Если объект видим, переходим к следующему шагу
             } else {
-                return "farGoal"; // Иначе цель далеко
+                return "rotate"; // Иначе поворачиваемся
             }
         }
     },
     flagSeek: {
         next: (input, state) => {
-            if (!ctu.getVisible(state.action.fl, input.see)) {
-                return "rotate"; // Иначе поворачиваемся
-            }
-            if (flag_closeness > ctu.getDistance(state.action.fl, input.see, input.agent)) {
-                return "closeFlag"; // Если флаг близко, переходим в closeFlag
+            if (ctu.getVisible(state.action.fl, input.see)) {
+                return 3 > ctu.getDistance(state.action.fl, input.see, input.agent) //далеко?
+                    ? "closeFlag" // близко
+                    : "farGoal" // далеко
             } else {
-                return "farGoal"; // Иначе цель далеко
+                return "rotateToGoal"
             }
         }
     },
     closeFlag: {
         exec(input, state) {
-            state.action = state.commands_queue.dequeue();
+            state.commands_queue.dequeue()
+            state.action = state.commands_queue.peek()
         },
         next: (input, state) => {
             if (state.commands_queue.isEmpty()) {
@@ -91,77 +110,96 @@ const DT = {
             }
         },
     },
-    rotate: {
-        exec(input, state) {
-            state.command = {n: "turn", v: rotation_speed}
-        }
-        ,
-        next: (input, state) => "sendCommand",
-    },
     farGoal: {
         next: (input, state) => {
-            if (Math.abs(ctu.getAngle(state.action.fl, input.see)) > goal_angle) {
-                return "rotateToGoal"; // Если угол больше goalAngle, поворачиваем к цели
-            } else {
-                return "runToGoal"; // Иначе бежим к цели
-            }
+            return ctu.getAngle(state.action.fl, input.see)
+            > Math.min(15, ctu.getDistance(state.action.fl, input.see, input.agent) * 2)  // большой угол
+                ? "rotateToGoal" // поворачиваемся
+                : "runToGoal" // бежим к цели
         }
     },
     rotateToGoal: {
         exec(input, state) {
-            state.command = {n: "turn", v: ctu.getAngle(state.action.fl, input.see)}
+            let angle
+            ctu.getVisible(state.action.fl, input.see)
+                ? angle = ctu.getAngle(state.action.fl, input.see)
+                : angle = ctu.getTurnToObjectAngle(state.action.goal, is_last_turn(state), input.agent)
+            state.command = {n: "turn", v: angle}
         },
-        next: (input, state) => "sendCommand",
+        next: (input, state) => "sendCommand"
     },
     runToGoal: {
         exec(input, state) {
-            state.command = {n: "dash", v: Math.min(100, ctu.getDistance(state.action.fl, input.see, input.agent) * 15)}
+            state.command = {n: "dash", v: Math.min(100, ctu.getDistance(state.action.fl, input.see, input.agent) * 40)}
         },
-        next: (input, state) => "sendCommand",
+        next: (input, state) => "sendCommand"
     },
-    assist: {
+    sendCommand: {command: (input, state) => state.command},
+    ballSeek: {
         next: (input, state) => {
-            if (ctu.getVisibleTeammatesCount(input.see, input.team_name) > 0) {
-                return "pass"; // Если видим игрока, передаем мяч
+            if (ctu.getVisible(state.action.fl, input.see)) {
+                return 1 > ctu.getDistance(state.action.fl, input.see, input.agent) // мяч далеко?
+                    ? "closeBall" // близко
+                    : "farGoal" // далеко
             } else {
-                return "wait"; // Иначе ждем
+                return "rotateFixAngle"
             }
-        }
+        },
     },
-    wait: {
+    teammateSeek: {
         next: (input, state) => {
-            if (state.wait >= wait_time) {
-                return "findPlayer"; // Если время ожидания истекло, ищем игрока
+
+            let teammate = ctu.getVisibleTeammate(input.see, input.team_name)
+            if (teammate) {
+
+                const dist = teammate.p[0];
+                const angle = teammate.p[1];
+                if (dist < 10) {
+                    return "closeFlag"
+                } else {
+                    return angle > Math.min(30, dist * 2)  // большой угол
+                        ? "rotateToTeammate" // поворачиваемся
+                        : "runToTeammate" // бежим к цели
+                }
             } else {
-                state.wait++;
-                return "sendCommand"; // Иначе увеличиваем время ожидания
+                return "rotateFixAngle"
             }
+        },
+    },
+    rotateToTeammate: {
+        exec(input, state) {
+            state.command = {n: "turn", v: ctu.getVisibleTeammate(input.see, input.team_name).p[1]}
+        },
+        next: (input, state) => "sendCommand"
+    },
+    runToTeammate: {
+        exec(input, state) {
+            state.command = {n: "dash", v: 100}
+        },
+        next: (input, state) => "sendCommand"
+    },
+    rotateFixAngle: {
+        exec(input, state) {//add rotate from controller
+            state.command = {n: "turn", v: "30"}
+        },
+        next: (input, state) => "sendCommand",
+    },
+    closeBall: {
+        next: (input, state) => {
+            let angle, v
+            ctu.getVisible(state.action.goal, input.see)
+                ? {angle, v} = ctu.kickBallVisible(state.action.goal, input.see)
+                : {angle, v} = ctu.kickBallInVisible(state.action.goal, is_last_turn(state), input.side)
+            if (!angle) {
+                angle = 0
+            }
+            if (!v) {
+                v = 20
+            }
+            state.command = {n: "kick", v: v, a: angle}
+            state.commands_queue.enqueueFront({act: 'cmd', cmd: {n: "turn", v: angle}})
+            return "sendCommand"
         }
-    },
-    findPlayer: {
-        exec(input, state) {
-            state.command = {n: "kick", v: `10 ${-30 -(Math.random() * 10) % 5}`}
-        },
-        next: (input, state) => "sendCommand",
-    },
-    pass: {
-        exec(input, state) {
-            const teammate = ctu.getVisibleTeammate(input.see, input.team_name)
-            const dist = teammate.p[0];
-            const angle = teammate.p[1];
-
-            let kick_strength = Math.min(50, Math.floor(dist * 4))
-            let kick_angle = Math.max(angle);
-
-            state.command = {n: "kick", v: kick_strength + " " + kick_angle};
-            state.commands_queue.dequeue()
-            state.commands_queue.enqueueFront({act: "cmd", cmd: {n: "say", v: "go"}})
-
-        },
-        next: (input, state) => "sendCommand",
-    },
-    sendCommand: {
-        command: (input, state) => state.command,
     },
 }
 module.exports = DT;

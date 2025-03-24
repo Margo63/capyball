@@ -13,6 +13,24 @@ class LocationUtils {
         return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
     }
 
+    static isMySide(agent, side) {
+        if (side === 'l') {
+            return agent.x < 0
+        }
+        if (side === 'r') {
+            return agent.x > 0
+        }
+    }
+
+    static isEnemySide(agent, side) {
+        if (side === 'l') {
+            return agent.x > 0
+        }
+        if (side === 'r') {
+            return agent.x < 0
+        }
+    }
+
     // Функция для минимизации
     static locationError = ([X, Y], objects) => {
         let totalError = 0
@@ -74,6 +92,7 @@ class LocationUtils {
         }
         return {x: predictXY.x, y: predictXY.y, team: enemy_p.cmd.p[1]}
     }
+
     static getBallCoord(ball, agentCoords) {
         let predictXY = LocationUtils.predict(agentCoords.x, agentCoords.y, ball.p[0], MathUtils.toRadians(ball.p[1]))
 

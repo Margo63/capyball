@@ -41,7 +41,7 @@ const DT_Goalkeeper = {
                     if (state.action.to === "refresh") {
                         console.log("----------------- refresh --------------------")
                         refresh_queue(state, init_commands, input.side)
-                        state.command = {n: "move", v: input.start_coords};
+                        state.command = {n: "move", v: state.start_coords};
                         state.wait = 0;
                         return 'sendCommand'
                     }
