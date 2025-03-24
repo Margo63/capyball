@@ -19,6 +19,7 @@ const DT_Goalkeeper = {
     root: {
 
         processCmd(state, cmd) {
+
             if (cmd === "play_on") {
                 state.commands_queue.enqueueFront({act: 'tree', to: "refresh"})
             }
@@ -30,6 +31,8 @@ const DT_Goalkeeper = {
             root_exec(state, {act: "gate"})
         },
         next: (input, state) => {
+
+            console.log("PASSER")
             switch (state.action.act) {
                 case PR:
                     return 'checkBallVisibility'

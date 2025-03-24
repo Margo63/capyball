@@ -53,6 +53,7 @@ const DT = {
             console.log("exec", state.commands_queue)
         },
         next: (input, state) => {
+            console.log("FORWAARD")
             switch (state.action.act) {
                 case CMD:
                     return "sendCommand"
@@ -61,7 +62,7 @@ const DT = {
                 case KI:
                     return "ballSeek"
                 case TM:
-                    return "teammateSeek"
+                    return "ballSeek"
                 case TR:
                     if (state.action.to === "refresh") {
                         console.log("----------------- refresh --------------------")
