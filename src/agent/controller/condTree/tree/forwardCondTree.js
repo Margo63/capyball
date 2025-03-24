@@ -42,11 +42,11 @@ const DT = {
             }
             if (cmd === '"go"') {
                 state.commands_queue.enqueueFront({act: "kick", fl: ball, goal: getEnemyGoal(input.side)})
-                return;
             }
         },
         exec(input, state) {
             if (input.isMySide) {
+                console.log("myside")
                 refresh_queue(state, state.init_commands, input.side)
             }
             root_exec(state, {act: 'tree', to: "refresh"})
@@ -124,7 +124,8 @@ const DT = {
             let angle
             ctu.getVisible(state.action.fl, input.see)
                 ? angle = ctu.getAngle(state.action.fl, input.see)
-                : angle = ctu.getTurnToObjectAngle(state.action.goal, is_last_turn(state), input.agent)
+                : angle = ctu.getTurnToObjectAngle(state.action.goal, is_last_turn(state), 30,  input.agent)
+            console.log(2, {n: "turn", v: angle})
             state.command = {n: "turn", v: angle}
         },
         next: (input, state) => "sendCommand"
@@ -147,41 +148,9 @@ const DT = {
             }
         },
     },
-    teammateSeek: {
-        next: (input, state) => {
-
-            let teammate = ctu.getVisibleTeammate(input.see, input.team_name)
-            if (teammate) {
-
-                const dist = teammate.p[0];
-                const angle = teammate.p[1];
-                if (dist < 10) {
-                    return "closeFlag"
-                } else {
-                    return angle > Math.min(30, dist * 2)  // большой угол
-                        ? "rotateToTeammate" // поворачиваемся
-                        : "runToTeammate" // бежим к цели
-                }
-            } else {
-                return "rotateFixAngle"
-            }
-        },
-    },
-    rotateToTeammate: {
-        exec(input, state) {
-            state.command = {n: "turn", v: ctu.getVisibleTeammate(input.see, input.team_name).p[1]}
-        },
-        next: (input, state) => "sendCommand"
-    },
-    runToTeammate: {
-        exec(input, state) {
-            state.command = {n: "dash", v: 100}
-        },
-        next: (input, state) => "sendCommand"
-    },
     rotateFixAngle: {
         exec(input, state) {//add rotate from controller
-            state.command = {n: "turn", v: "30"}
+            state.command = {n: "turn", v: "15"}
         },
         next: (input, state) => "sendCommand",
     },
