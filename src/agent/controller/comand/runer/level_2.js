@@ -52,7 +52,7 @@ const CTRL_MIDDLE = {
     },
     rotateCenter(input) { // Повернуться к центру
         const index = input.see.constant_labels.findIndex(function(label) {
-            return label.fl == "fc"
+            return label.fl === "fc"
         });
 
         if (index===-1) return {n: "turn", v: 60}
@@ -62,25 +62,25 @@ const CTRL_MIDDLE = {
     ,
     seekBall(input) {// Осмотр поля
         const index = input.see.constant_labels.findIndex(function(label) {
-            return label.fl == "b"
+            return label.fl === "b"
         });
 
         if (index!==-1) {
             const angle = input.see.constant_labels[index].angle
             if (Math.abs(angle) > 10)
                 return {n: "turn", v: angle}
-            if (this.turnData == "ft0") this.turnData = "fb0"
-            else if (this.turnData == "fb0") {
+            if (this.turnData === "ft0") this.turnData = "fb0"
+            else if (this.turnData === "fb0") {
                 this.turnData = "ft0"
                 this.action = "rotateCenter"
                 return this.rotateCenter(input)
             }
 
         }
-        if (this.turnData == "ft0")
-            return {n: "turn", v: this.side == "l" ? -30 : 30}
-        if (this.turnData == "fb0")
-            return {n: "turn", v: this.side == "l" ? 30 : -30}
+        if (this.turnData === "ft0")
+            return {n: "turn", v: this.side === "l" ? -30 : 30}
+        if (this.turnData === "fb0")
+            return {n: "turn", v: this.side === "l" ? 30 : -30}
 
         throw `Unexpected state ${JSON.stringify(this)},${JSON.stringify(input)}`
     },

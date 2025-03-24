@@ -1,4 +1,10 @@
 const CTRL = {
+    getTree(controllers, number) {
+        const next = controllers[0]// Следующий уровень
+        if (next) { // Вызов следующего уровня
+            return next.getTree( controllers.slice(1), number)
+        }
+    },
     execute(input, controllers) {
         const next = controllers[0]// Следующий уровень
         let result = undefined
@@ -7,12 +13,12 @@ const CTRL = {
         if (next) { // Вызов следующего уровня
             const upper = next.execute(input, controllers.slice(1))
             // TODO Обработка ответа upper (обновление result)
-            if(upper!==undefined){
+            if (upper !== undefined) {
                 result = upper
-            }else{
+            } else {
                 console.log("empty upper")
             }
-        }else{
+        } else {
             console.log("empty")
             result = {n: 'turn', v: 0}
         }

@@ -66,7 +66,7 @@ class LocationUtils {
         }
     }
 
-    static getEnemyInfo(enemy_p, agentCoords, needLog) {
+    static getPlayerInfo(enemy_p, agentCoords, needLog) {
         let predictXY = LocationUtils.predict(agentCoords.x, agentCoords.y, enemy_p.p[0], MathUtils.toRadians(enemy_p.p[1]))
 
         if (needLog) {

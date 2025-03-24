@@ -170,14 +170,56 @@ someone reached his goal
 message = "reached_${state.action.fl}"
  ```
 
-### obeyed
-someone reached his goal
+## levels
+this.taken in goalkeeper
 ```javascript 
-message = "obeyed_${state.action.fl}"
+this.taken = {
+    ballPrev: {
+        x: 40.80002955807417,
+        y: -38.71177143267764,
+        f: 'b',
+        dist: 27.1,
+        angle: -21
+    },
+    ball: {
+        x: 40.80002955807417,
+        y: -38.71177143267764,
+        f: 'b',
+        dist: 27.1,
+        angle: -21
+    },
+    hear: [ 4198, 'referee', 'play_on' ],
+    see: {
+        all_labels_name: [
+            'fc',    'fcb',   'flb',   'fglb',
+            'gl',    'fglt',  'fplb',  'fplc',
+            'fplt',  'F',     'fb0',   'fbr10',
+            'fbr20', 'fbr30', 'fbr40', 'fbl10',
+            'fbl20', 'fbl30', 'fbl40', 'fbl50',
+            'fl0',   'flb10', 'flb20', 'flb30',
+            'b',     'lt',    'lb'
+        ],
+        all_labels:  [ ... ],
+        constant_labels: [ ... ],
+        p_labels: [...],
+        g_labels:  [ ... ],
+        b_labels:  [ ... ],
+        time: 4217
+    },
+    setHear: [Function: setHear],
+    setSee: [Function: setSee],
+    closestToBall: [Function: closestToBall],
+    isPassing: [Function: isPassing],
+    pos: { x: 15.5, y: -29 },
+    time: 4217,
+    team_name: undefined,
+    side: undefined,
+    goalOwn: { x: 52.5, y: 0, f: 'gr' },
+    goal: { x: -52.5, y: 0, f: 'gl', dist: 55.1, angle: 0.6457718232379019 },
+    canKick: false,
+    cmd: { n: 'turn', v: 180 },
+    action: 'rotateCenter',
+    newAction: 'return'
+}
  ```
-
-видит->принимает за лидера->говорит
-слышит->если это мой лидер, то сравнивает
-если он всё ещё мой лидер->повторяет
-если он уже не мой лидер->ищу другого менее близкого
 

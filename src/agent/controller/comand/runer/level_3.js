@@ -2,15 +2,15 @@ const CTRL_HIGH = {
     execute(input) {
         //console.log("ctrl3")
         //console.log(input)
-        const immediate = this.immidiateReaction(input)
+        const immediate = this.immediateReaction(input)
         if (immediate) return immediate
         const passing = this.passing(input)
         if (passing) return passing
-        if (this.last == "passing")
+        if (this.last === "passing")
             input.newAction = "return"
         this.last = "previous"
     },
-    immidiateReaction(input) { // Немедленная реакция
+    immediateReaction(input) { // Немедленная реакция
         if (input.canKick) {
             this.last = "kick"
             if (input.goal){
@@ -25,7 +25,7 @@ const CTRL_HIGH = {
         if (input.ball && input.teamOwn) {
 
             const players = input.isPassing()
-            if (players && players[0].side == "my" && players[0].player.dist_to_ball < input.ball.dist) {
+            if (players && players[0].side === "my" && players[0].player.dist_to_ball < input.ball.dist) {
                 this.last = "passing"
                 if (Math.abs(input.ball.angle) > 5)
                     return {n: 'turn', v: input.ball.angle}

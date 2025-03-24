@@ -4,35 +4,25 @@ const Manager = require('./condTree/mgr');
 const ctrl = require('./comand/control');
 
 const {toRadians} = require('./utils/mathUtils');
-const {getEnemyInfo, getAgentBestCoordinates} = require('./utils/locationUtils');
+const {getPlayerInfo, getAgentBestCoordinates} = require('./utils/locationUtils');
 const CommandQueue = require("./commandQueue");
 const {getTurnAngle, isGoal} = require("./utils/actUtils");
 
 class Controller {
 
-    constructor(DT, TA,teamName,controllers,side="l") {
+    constructor(teamName, controllers, number) {
         this.act = null
-        this.last_act = null
         this.speed = 100
         this.angle = {grad: 0.0, rad: 0.0}
         this.my_coord = {x: 0.0, y: 0.0}
         this.run = false
         this.position = null
         this.team_name = teamName
-        this.side = side
         this.id = null
-        this.DT = DT
-        this.TA = TA
         this.debug = false
         this.mgr = new Manager(this.team_name)
         this.controllers = controllers
-    }
-
-    reset_act() {
-        if (this.act != null) {
-            this.last_act = this.act
-            this.act = null
-        }
+        this.number = number
     }
 
     analyze(msg, cmd, p) {
@@ -40,7 +30,6 @@ class Controller {
         switch (cmd) {
             case "see":
                 this.evaluateSee(p)
-
                 break;
             case "hear":
                 this.evaluateHear(msg, p)
@@ -63,9 +52,7 @@ class Controller {
             default:
             //console.log("cmd not found")
         }
-        let result = this.act
-        this.reset_act()
-        return result
+        return this.act
     }
 
     evaluateSee(p) {
@@ -76,7 +63,7 @@ class Controller {
             this.my_coord = getAgentBestCoordinates(labels.constant_labels, false)
 
             if (labels.p_labels.length !== 0) {
-                const enemy = getEnemyInfo(labels.p_labels[0], this.my_coord, false)
+                const enemy = getPlayerInfo(labels.p_labels[0], this.my_coord, false)
             }
             //this.act = {n: "turn", v: 1}
             this.executeAct(labels)
@@ -84,49 +71,38 @@ class Controller {
     }
 
     evaluateHear(msg, p) {
+        let processDTCmd = (cmd) => {
+            if (!this.DT) {
+                this.DT = ctrl.getTree(this.controllers, this.number)
+                console.log(this.DT)
+            }
+            this.DT.root.processCmd(this.mgr, this.DT.state, cmd)
+        }
         if (this.debug) console.log(msg, p)
         if (this.debug) console.log("IM HERERE", msg, p)
         Manager_ta.setHear(p)
         switch (p[2]) {
             case "play_on":
-                this.run = true
-                if (this.debug) console.log("PLAY WAS STARTED!")
+                if (!this.run) {
+                    this.run = true
+                    processDTCmd(p[2])
+                    if (this.debug) console.log("PLAY WAS STARTED!")
+                }
                 break
             default:
                 let isGoalMessage = isGoal(p[2], this.position)
                 if (isGoalMessage) {
-                    if (this.debug) console.log("GOOAL!!!")
+                    this.run = false
                     if (isGoalMessage.win) {
-                        let currentCommand = this.DT.state.commands_queue.peek()
-                        if (currentCommand && currentCommand.act === 'kick') {
-                            this.DT.state.commands_queue.dequeue()
-                        }
+                        if (this.debug) console.log("GOOAL!!!")
+                        processDTCmd("win_goal")
                     } else if (this.debug) {
                         console.log("GOAL...SAD...")
                     }
-                } else if (p[2].startsWith('"reached_')) {
-                    const message = p[2].replace(/"/g, ''); // Удаляем кавычки
-                    console.log(p[2])
-                    // Парсинг сообщения "reached fct"
-                    const flag = message.split("_")[1]; // Получаем флаг из сообщения
-
-                    if (this.debug) console.log(`Reached flag: ${flag}`);
-                    this.handleReachedFlag(flag);
-
-                } else if (p[2].startsWith('"obeyed_')) {
-                    const message = p[2].replace(/"/g, ''); // Удаляем кавычки
-                    if (this.debug) console.log(p[2])
-                    // Парсинг сообщения "reached fct"
-                    const flag = message.split("_")[1]; // Получаем флаг из сообщения
-
-                    if (this.debug) console.log(`Obeyed to: ${flag}`);
-                    // Здесь можно добавить дополнительную логику для обработки флага
-                    this.handleReachedFlag(flag);
-
+                } else {
+                    processDTCmd(p[2])
                 }
-
         }
-
     }
 
     evaluateSenseBody(p) {
@@ -182,38 +158,33 @@ class Controller {
         }
         if (needLog) {
             if (this.debug) console.log("-------------START----------------", all_labels_name,
-                constant_labels,
-                p_labels,
-                g_labels,
-                b_labels, "-------------END----------------")
+                constant_labels, p_labels, g_labels, b_labels, "-------------END----------------")
         }
 
         return {
             all_labels_name,
-            all_labels: p.slice(1),
-            constant_labels,
-            p_labels,
-            g_labels,
-            b_labels,
+            all_labels: p.slice(1), constant_labels, p_labels, g_labels, b_labels,
             time: p[0]
         }
     }
 
     executeAct(labels) {
-        //Manager_ta.setHear([labels, this.my_coord])
-        //this.act = Manager_ta.getAction([labels, this.my_coord], this.TA, this.team_name, this.side)
-        this.act = ctrl.execute([labels, this.my_coord],this.controllers)
-        //console.log(ctrl.execute([labels, this.my_coord],this.controllers))
-        //this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.id)
-    }
-
-    handleReachedFlag(flag) {
-        let queue = this.DT.state.commands_queue
-        if (this.debug) console.log(!queue.isEmpty(), queue.peek().act === "flag", queue.peek().fl === flag)
-        if (!queue.isEmpty() && queue.peek().act === "flag" && queue.peek().fl === flag) {
-            //console.log("HEEREEE")
-            queue.dequeue()
+        let input = {
+            labels: labels,
+            side: this.position,
+            agent: {
+                x: this.my_coord.x,
+                y: this.my_coord.y,
+                angleRad: this.angle.rad,
+                angleGrad: this.angle.grad,
+            },
+            start_coords: this.start_coords,
+            dt: this.DT,
+            team: this.team_name,
+            number: this.number
         }
+        this.act = ctrl.execute(input, this.controllers)
+        //         this.act = this.mgr.getAction(this.DT, labels, this.my_coord, this.position, this.id)
     }
 }
 

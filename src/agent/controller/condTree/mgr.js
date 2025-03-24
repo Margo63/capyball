@@ -86,28 +86,38 @@ class Manager {
         return teammates;
     }
 
+    getVisibleTeammate() {
+        const teammates = this.labels.p_labels.filter(player => {
+            console.log(player.cmd.p[1])
+            return player.cmd.p[1] === '"' + this.team_name + '"'; // Проверяем название команды
+
+        });
+        console.log(teammates)
+        return teammates.length > 0 ? teammates[0] : null;
+    }
+
     kickBallVisible(fl) {
         const index = this.getIndex(fl)
         let angle, v
-        if (this.labels.all_labels[index].p[0] < 30) {
+        if (this.labels.all_labels[index].p[0] < 20) {
             v = 100
         } else {
-            let minus_speed = this.labels.p_labels
-            // уменьшение скорости на minus_speed для того, чтобы не кидать на большие расстояния
-            v = Math.max(100 - minus_speed, 20)
+            v = 40
+            // let minus_speed = this.labels.p_labels
+            // // уменьшение скорости на minus_speed для того, чтобы не кидать на большие расстояния
+            // v = Math.max(100 - minus_speed, 40)
         }
         angle = this.labels.all_labels[index].p[1]
         return {v: v, angle: angle}
     }
 
     kickBallInVisible(fl, isLastActTurn) {
-        let v = 30
+        let v = 50
         let goal = getEnemyGoal(this.position)
         let angle = this.getTurnToObjectAngle(goal.coords, isLastActTurn, 45)
         return {v: v, angle: angle}
     }
 
-//sometimes call err "Maximum call stack size"
     getTurnToObjectAngle(constantCoords, isLastActTurn, default_value) {
         if (constantCoords !== undefined && !isLastActTurn/* если есть шанс, что запутался, то идём перебирать*/) {
             return getTurnAngle(this.agent.x, this.agent.y, constantCoords.x, constantCoords.y, this.agent.angleRad)
