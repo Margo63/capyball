@@ -6,14 +6,14 @@ class Agent {
         this.act = null // Действия
         this.controller = controller
 
-        this.rl = readline.createInterface({// Чтение консоли
+     /*   this.rl = readline.createInterface({// Чтение консоли
             input: process.stdin,
             output: process.stdout
 
-        })
+        })*/
         this.speed = 0
         console.log("Write X Y Speed")
-        this.rl.on('line', (input) => { //Обработка строки из консоли
+        /*this.rl.on('line', (input) => { //Обработка строки из консоли
                 if (this.controller.run) {// Если игра начата
 
                     // Движения вперед, вправо, влево, удар по мячу
@@ -30,7 +30,7 @@ class Agent {
                     }
                 }
             }
-        )
+        )*/
     }
 
     msgGot(msg) { // Получение сообщения
