@@ -3,43 +3,32 @@ const ctu = require("../../condTree/tree/utils/condTreeUtils");
 const DEF_ROTATE_ANGLE = 30
 const DEF_BALLSEEK_ANGLE = 30
 const DT_PASSER = require('../../condTree/tree/passerCondTree');
-const DT_SCORING = require('../../condTree/tree/forwardCondTree');
+const DT_FORWARD = require('../../condTree/tree/forwardCondTree');
 
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
         let dt
         switch (number) {
-            case 1:
-                dt = DT_PASSER
+            case 8:
+                dt = DT_FORWARD
                 dt.state.init_commands = [{act: "flag", fl: "fp?c"}, {act: "kick", fl: ball}]
                 dt.state.start_coords = "-25 -10"
                 return dt
-            case 2:
-                dt = DT_PASSER
+            case 9:
+                dt = DT_FORWARD
                 dt.state.init_commands = [{act: "flag", fl: "fp?t"}, {act: "kick", fl: ball}]
                 dt.state.start_coords = "-25 0"
                 return dt
-            case 3:
-                dt = DT_PASSER
+            case 10:
+                dt = DT_FORWARD
                 dt.state.init_commands = [{act: "flag", fl: "fp?b"}, {act: "kick", fl: ball}]
                 dt.state.start_coords = "-25 10"
                 return dt
-            case 4:
-                dt = DT_SCORING
-                dt.state.init_commands = [{act: "flag", fl: "fp*t"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "25 -10"
-                return dt
-            case 5:
-                dt = DT_SCORING
-                dt.state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "25 10"
-                return dt
             default:
-                dt = DT_SCORING
+                dt = DT_FORWARD
                 dt.state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
                 dt.state.start_coords = "25 10"
                 return dt
-
         }
 
     },
