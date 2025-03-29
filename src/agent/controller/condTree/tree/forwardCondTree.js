@@ -1,5 +1,5 @@
 const CommandQueue = require("../../commandQueue");
-const {getEnemyGoal} = require("../../utils/constants");
+const {getEnemyGoal, getMyGoal} = require("../../utils/constants");
 const {
     FL,
     KI,
@@ -26,7 +26,7 @@ const slow_down_coefficient = 0.6;
 const DT = {
     terminate_command: "sendCommand",
     state: {
-        commands_queue: new CommandQueue({act: "kick", fl: ball}),
+        commands_queue: new CommandQueue({act: 'tree', to: "refresh"}),
         wait: 0,
         init_commands: [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}],
         prev_command: null, // Предыдущая команда
@@ -49,7 +49,7 @@ const DT = {
                 console.log("myside")
                 refresh_queue(state, state.init_commands, input.side)
             }
-            root_exec(state, {act: 'tree', to: "refresh"})
+            root_exec(state, {act: "kick", fl: ball})
             console.log("exec", state.commands_queue)
         },
         next: (input, state) => {
@@ -124,7 +124,7 @@ const DT = {
             let angle
             ctu.getVisible(state.action.fl, input.see)
                 ? angle = ctu.getAngle(state.action.fl, input.see)
-                : angle = ctu.getTurnToObjectAngle(state.action.goal, is_last_turn(state), 30,  input.agent)
+                : angle = ctu.getTurnToObjectAngle(state.action.goal, is_last_turn(state), 30, input.agent)
             console.log(2, {n: "turn", v: angle})
             state.command = {n: "turn", v: angle}
         },
@@ -155,6 +155,7 @@ const DT = {
         next: (input, state) => "sendCommand",
     },
     closeBall: {
+
         next: (input, state) => {
             let angle, v
             ctu.getVisible(state.action.goal, input.see)
