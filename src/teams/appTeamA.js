@@ -2,6 +2,7 @@ const Agent = require('../agent/agentGrid')
 const Controller = require('../agent/controller/controller')
 const VERSION = 7 // Версия сервера
 let teamName = "teamA" // Имя команды
+/*
 {
     const ctrl1 = require('../agent/controller/comand/goalkeeper/level_1')
     const ctrl2 = require('../agent/controller/comand/goalkeeper/level_2')
@@ -12,7 +13,7 @@ let teamName = "teamA" // Имя команды
     require('../serverCommunication/socket')(agent1, teamName, VERSION, true)
     agent1.socketSend("move", `-20 0`)
 }
-
+*/
 
 const ctrl1_f = require('../agent/controller/comand/forward/level_1')
 const ctrl2_f = require('../agent/controller/comand/forward/level_2')
@@ -38,6 +39,7 @@ const ctrl3_f = require('../agent/controller/comand/forward/level_3')
     require('../serverCommunication/socket')(agent3, teamName, VERSION)
     agent3.socketSend("move", `-25 -10`)
 }
+
 /*
 const ctrl1_d = require('../agent/controller/comand/defender/level_1')
 const ctrl2_d = require('../agent/controller/comand/defender/level_2')
