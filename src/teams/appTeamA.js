@@ -38,7 +38,7 @@ const ctrl3_f = require('../agent/controller/comand/forward/level_3')
     require('../serverCommunication/socket')(agent3, teamName, VERSION)
     agent3.socketSend("move", `-25 -10`)
 }
-
+/*
 const ctrl1_d = require('../agent/controller/comand/defender/level_1')
 const ctrl2_d = require('../agent/controller/comand/defender/level_2')
 const ctrl3_d = require('../agent/controller/comand/defender/level_3')
@@ -66,3 +66,5 @@ const ctrl3_d = require('../agent/controller/comand/defender/level_3')
     require('../serverCommunication/socket')(agent7, teamName, VERSION)
     agent7.socketSend("move", `-25 -10`)
 }
+
+ */
