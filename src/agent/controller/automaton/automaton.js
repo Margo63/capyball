@@ -78,7 +78,6 @@ const TA = {
             },
             beforeAction(taken, state) {
 // Действие перед каждым вычислением
-                //console.log(taken.ball)
                 if (taken.ball) state.variables.dist = taken.ball.dist
                 else if(taken.goalOwn) state.variables.dist = taken.goalOwn.dist
             },

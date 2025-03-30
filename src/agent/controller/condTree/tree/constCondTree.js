@@ -38,7 +38,6 @@ const DT = {
             }
             if (cmd.startsWith('"reached_')) {
                 const message = cmd.replace(/"/g, ''); // Удаляем кавычки
-                console.log(cmd)
                 const flag = message.split("_")[1]; // Получаем флаг из сообщения
                 handleReachedFlag(flag, state);
                 return

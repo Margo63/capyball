@@ -12,7 +12,7 @@ class Agent {
 
         })
         this.speed = 0
-        console.log("Write X Y Speed")
+        //console.log("Write X Y Speed")
         this.rl.on('line', (input) => { //Обработка строки из консоли
                 if (this.controller.run) {// Если игра начата
 
@@ -34,7 +34,6 @@ class Agent {
     }
 
     msgGot(msg) { // Получение сообщения
-        //console.log("2 msgGot"+msg)
         let data = msg.toString('utf8') // Приведение к строке
         this.processMsg(data) // Разбор сообщения
         this.sendCmd() // Отправка команды
@@ -46,12 +45,10 @@ class Agent {
 
 
     socketSend(cmd, value) {// Отправка команды
-        //console.log("1 send msg: "+`(${cmd} ${value})`)
         this.socket.sendMsg(`(${cmd} ${value})`)
     }
 
     processMsg(msg) { // Обработка сообщения
-        //console.log("3 processMsg:"+msg)
         let data = Msg.parseMsg(msg) // Разбор сообщения
         if (!data) throw new Error("Parse error\n" + msg)
         // Первое (hear) — начало игры
@@ -67,7 +64,6 @@ class Agent {
         if (this.controller.run) { // Игра начата
             if (this.act) { // Есть команда от игрока
                 this.socketSend(this.act.n, this.act.v + (this.act.a ? " " + this.act.a : ""))
-                //console.log(this.act.n, this.act.v + (this.act.a ? " " + this.act.a : ""))
             }
             this.act = null // reset comand
             //this.socketSend("turn", `20`) //every time turn after game start

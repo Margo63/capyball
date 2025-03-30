@@ -6,7 +6,6 @@ Taken = {
     ballPrev: undefined,
 
     setHear(input) {
-        //console.log("taken hear"+input)
         this.hear = input
     },
     setSee(input) {
@@ -55,7 +54,6 @@ Taken = {
         let my_team = []
         let enemy_team = []
         if (see.p_labels.length > 0) {
-            //console.log(see.p_labels)
             see.p_labels.forEach(function (player) {
                 const player_pos = getPlayerInfo(player, input.agent, false)
                 const player_info = {
