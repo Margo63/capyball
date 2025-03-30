@@ -19,7 +19,6 @@ const CTRL_HIGH = {
             }
             return state.command
         }
-
         return executeTree(dt, "root")
     },
 }

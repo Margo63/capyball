@@ -1,6 +1,7 @@
 const {getBallCoord, getPlayerInfo, isMySide, isEnemySide} = require('../utils/locationUtils');
 const {distance} = require('../utils/mathUtils');
 const {getFlagInfo, getReverseSide, FLAGS} = require('../utils/constants');
+const {amITheClosest} = require("../condTree/tree/utils/condTreeUtils")
 Taken = {
     ballPrev: undefined,
 
@@ -24,6 +25,7 @@ Taken = {
         this.time = see.time
         this.team_name = input.team
         this.side = input.side
+        this.amIClosestToBall = amITheClosest(input.labels, input.team)
         if (see.b_labels.length > 0) {
             const ball = getBallCoord(see.b_labels[0], input.agent)
 
