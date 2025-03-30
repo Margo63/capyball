@@ -47,25 +47,40 @@ const CTRL_MIDDLE = {
     immediateReaction(input) { // Немедленная реакция
 
         if (input.canKick) {
-            let enemy_goal = getEnemyGoal(input.side)
-            if (ctu.getVisible(enemy_goal.name, input.see)) {
-                console.log("see goal: "+ctu.getAngle(enemy_goal.name, input.see))
-                return {n: "kick", v: 100, a: ctu.getAngle(enemy_goal.name, input.see)}; // Бьем по воротам
+            const enemy_goal = getEnemyGoal(input.side)
+            //console.log(enemy_goal.fl+input.side)
+            if (ctu.getVisible(enemy_goal.fl, input.see)) {
+                //console.log("see goal: "+ctu.getAngle(enemy_goal.fl, input.see))
+                return {n: "kick", v: 100, a: ctu.getAngle(enemy_goal.fl, input.see)}; // Бьем по воротам
+            }
+
+            if (ctu.getVisible("ft0", input.see)){
+                console.log("see ft0 " +ctu.getAngle("ft0", input.see))
+                let a
+                if(input.side == "l"){
+                    a = 1
+                }else{
+                    a = -1
+                }
+                return {n: "kick", v: 10, a: 180+ a*ctu.getAngle("ft0", input.see)}
+            }
+
+            if (ctu.getVisible("fb0", input.see)){
+                console.log("see fb0 "+ctu.getAngle("fb0", input.see))
+                let a
+                if(input.side == "l"){
+                    a = -1
+                }else{
+                    a = 1
+                }
+                return {n: "kick", v: 10, a: 180+ a*ctu.getAngle("fb0", input.see)}
             }
             let my_goal = getMyGoal(input.side)
             if (ctu.getVisible(my_goal.name, input.see)) {
                 console.log("not fgoal")
-                return {n: "kick", v: 100, a: -ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
-            }
-            if (ctu.getVisible("ft0", input.see)){
-                console.log("see ft0")
-                return {n: "kick", v: 100, a: ctu.getAngle("ft0", input.see)}
+                return {n: "kick", v: 10, a: 180-ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
             }
 
-            if (ctu.getVisible("fb0", input.see)){
-                console.log("see fb0")
-                return {n: "kick", v: 100, a: ctu.getAngle("fb0", input.see)}
-            }
 
             if (ctu.getVisible("fg" + input.side + 't', input.see)){
                 console.log("see my goal "+"fg" + input.side + 't')
@@ -78,7 +93,7 @@ const CTRL_MIDDLE = {
             }
 
             console.log("nothing see")
-            return {n: "kick", v: 100, a: -ctu.getAngle(ball, input.see)}; // Отбиваем мяч
+            return {n: "kick", v: 10, a: 90}; // Отбиваем мяч
         }
     },
 }

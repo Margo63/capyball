@@ -3,7 +3,7 @@ const Controller = require('../agent/controller/controller')
 const VERSION = 7 // Версия сервера
 let teamName = "teamA" // Имя команды
 
-/*
+
 {
     const ctrl1 = require('../agent/controller/comand/goalkeeper/level_1')
     const ctrl2 = require('../agent/controller/comand/goalkeeper/level_2')
@@ -65,7 +65,7 @@ const ctrl3_d = require('../agent/controller/comand/defender/level_3')
     require('../serverCommunication/socket')(agent7, teamName, VERSION)
     agent7.socketSend("move", `-25 -10`)
 }
-*/
+
 const ctrl1_f = require('../agent/controller/comand/forward/level_1')
 const ctrl2_f = require('../agent/controller/comand/forward/level_2')
 const ctrl3_f = require('../agent/controller/comand/forward/level_3')

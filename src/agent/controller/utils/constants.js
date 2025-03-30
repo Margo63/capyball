@@ -48,9 +48,9 @@ class Constants {
     static getEnemyGoal(side) {
         switch (side) {
             case 'r':
-                return {fl: 'gl', coords: Constants.FLAGS['gl']}
+                return {fl: 'gl', coords: Constants.FLAGS['gl'], name:'gl'}
             case 'l':
-                return {fl: 'gr', coords: Constants.FLAGS['gr']}
+                return {fl: 'gr', coords: Constants.FLAGS['gr'], name: 'gr'}
             default:
                 return null
         }
