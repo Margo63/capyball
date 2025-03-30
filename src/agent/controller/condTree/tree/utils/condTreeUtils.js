@@ -14,7 +14,6 @@ class CondTreeUtils {
     static PR = "protect" // {act: "protect", fl: "b"}
     static TM = "teammate" // {act: "teammate"}
     static root_exec(state, default_action) {
-        console.log(state)
         if (state.commands_queue.isEmpty()) {
             console.log("Query is empty")
             // как только придёт новая цель - он переключится на неё.

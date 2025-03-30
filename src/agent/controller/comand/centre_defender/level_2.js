@@ -2,11 +2,14 @@ const {getEnemyGoal, getMyGoal, ball} = require("../../utils/constants");
 const ctu = require("../../condTree/tree/utils/condTreeUtils");
 const DT_CENTER_DEFENDER = require('../../condTree/tree/centerDefenderCondTree');
 const DT_SCORING = require('../../condTree/tree/forwardCondTree');
+const CommandQueue = require("../../commandQueue");
 
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
-        let dt= DT_CENTER_DEFENDER
-        let state
+        let dt = DT_CENTER_DEFENDER
+        let state = {
+            commands_queue: new CommandQueue({act: 'tree', to: "refresh"}),
+        }
         switch (number) {
             case 1:
                 state.init_commands = [{act: "flag", fl: "fp?c"}, {act: "kick", fl: ball}]
@@ -29,6 +32,11 @@ const CTRL_MIDDLE = {
     },
     execute(input, controllers) {
 
+
+        const immediate = this.immediateReaction(input)
+        if (immediate) return immediate
+        // const defend = this.defendGoal(input)
+        // if (defend) return defend
 
         const next = controllers[0] // Следующий уровень
         if (next) { // Вызов следующего уровня

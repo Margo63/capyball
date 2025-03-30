@@ -3,24 +3,26 @@ const ctu = require("../../condTree/tree/utils/condTreeUtils");
 const DEF_ROTATE_ANGLE = 30
 const DEF_BALLSEEK_ANGLE = 30
 const DT_FORWARD = require('../../condTree/tree/forwardCondTree');
+const CommandQueue = require("../../commandQueue");
 
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
         let dt = DT_FORWARD
-        let state
+        let state = {
+            commands_queue: new CommandQueue({act: 'tree', to: "refresh"}),
+        }
         switch (number) {
             case 8:
-
                 state.init_commands = [{act: "flag", fl: "fp*t"}, {act: "kick", fl: ball}]
                 state.start_flag = "fp*t"
                 return {dt, state}
             case 9:
-                dt.state.init_commands = [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}]
-                dt.state.start_flag = "fp*c"
+                state.init_commands = [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}]
+                state.start_flag = "fp*c"
                 return {dt, state}
             case 10:
-                dt.state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                dt.state.start_flag = "fp*b"
+                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
+                state.start_flag = "fp*b"
                 return {dt, state}
             default:
                 state.init_commands = [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}]
@@ -31,6 +33,11 @@ const CTRL_MIDDLE = {
     },
     execute(input, controllers) {
 
+
+        const immediate = this.immediateReaction(input)
+        if (immediate) return immediate
+        // const defend = this.defendGoal(input)
+        // if (defend) return defend
 
         const next = controllers[0] // Следующий уровень
         if (next) { // Вызов следующего уровня

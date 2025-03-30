@@ -3,38 +3,43 @@ const ctu = require("../../condTree/tree/utils/condTreeUtils");
 const DEF_ROTATE_ANGLE = 30
 const DEF_BALLSEEK_ANGLE = 30
 const DT_DEFENDER = require('../../condTree/tree/defenderCondTree');
+const CommandQueue = require("../../commandQueue");
 
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
         let dt = DT_DEFENDER
-        let state
+        let state = {
+            commands_queue: new CommandQueue({act: 'tree', to: "refresh"}),
+        }
         switch (number) {
             case 4:
-                state.init_commands = [{act: "flag", fl: "fp*t"}, {act: "kick", fl: ball}]
-                state.start_coords = "25 -10"
+                state.init_commands = [{act: "flag", fl: "fc"}, {act: "kick", fl: ball}]
+                state.start_flag = "fc"
                 return {dt, state}
             case 5:
-                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                state.start_coords = "25 10"
+                state.init_commands = [{act: "flag", fl: "fp?t"}, {act: "kick", fl: ball}]
+                state.start_flag = "fp?t"
                 return {dt, state}
             case 6:
-                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                state.start_coords = "25 10"
+                state.init_commands = [{act: "flag", fl: "fp?c"}, {act: "kick", fl: ball}]
+                state.start_flag = "fp?c"
                 return {dt, state}
             case 7:
-                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                state.start_coords = "25 10"
+                state.init_commands = [{act: "flag", fl: "fp?b"}, {act: "kick", fl: ball}]
+                state.start_flag = "fp?b"
                 return {dt, state}
             default:
-                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                state.start_coords = "25 10"
+                state.init_commands = [{act: "flag", fl: "fp?b"}, {act: "kick", fl: ball}]
+                state.start_flag = "fp?t"
                 return {dt, state}
-
         }
-
     },
     execute(input, controllers) {
 
+        const immediate = this.immediateReaction(input)
+        if (immediate) return immediate
+        // const defend = this.defendGoal(input)
+        // if (defend) return defend
 
         const next = controllers[0] // Следующий уровень
         if (next) { // Вызов следующего уровня

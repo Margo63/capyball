@@ -4,6 +4,7 @@ const {getTurnAngle} = require("../../utils/actUtils");
 const CTRL_HIGH = {
     execute(input) {
         let dt = input.dt
+        let state = input.state
 
         function executeTree(dt, title) {
             let current_title = title
@@ -12,11 +13,11 @@ const CTRL_HIGH = {
                 //console.log(current_title)
                 const action = dt[current_title]
                 if (typeof action.exec == "function") {
-                    action.exec(input, dt.state)
+                    action.exec(input, state)
                 }
-                current_title = action.next(input, dt.state)
+                current_title = action.next(input, state)
             }
-            return dt.state.command
+            return state.command
         }
 
         return executeTree(dt, "root")

@@ -13,9 +13,10 @@ Taken = {
         this.see = see
         this.agent = input.agent
         this.dt = input.dt
+        this.state = input.state
         this.start_coords = input.start_coords
-        this.isMySide = isMySide(this.agent, this.side)
-        this.isEnemySide = isEnemySide(this.agent, this.side)
+        this.isMySide = isMySide(this.agent, this.side, 5)
+        this.isEnemySide = isEnemySide(this.agent, this.side, 5)
         this.pos = {
             x: input.agent.x,
             y: input.agent.y

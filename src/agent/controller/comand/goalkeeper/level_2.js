@@ -4,11 +4,14 @@ const DEF_ROTATE_ANGLE = 30
 const DEF_BALLSEEK_ANGLE = 30
 
 const DT_GOALKEEPER = require('../../condTree/tree/goalKeeperCondTree');
+const CommandQueue = require("../../commandQueue");
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
 
         let dt = DT_GOALKEEPER
-        let state
+        let state = {
+            commands_queue: new CommandQueue({act: 'tree', to: "refresh"}),
+        }
         state.start_coords = "-25 -10"
         return {dt, state}
     },

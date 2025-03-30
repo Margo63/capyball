@@ -13,21 +13,21 @@ class LocationUtils {
         return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
     }
 
-    static isMySide(agent, side) {
+    static isMySide(agent, side, board = 0) {
         if (side === 'l') {
-            return agent.x < 0
+            return agent.x < board
         }
         if (side === 'r') {
-            return agent.x > 0
+            return agent.x > -board
         }
     }
 
-    static isEnemySide(agent, side) {
+    static isEnemySide(agent, side, board = 0) {
         if (side === 'l') {
-            return agent.x > 0
+            return agent.x > board
         }
         if (side === 'r') {
-            return agent.x < 0
+            return agent.x < -board
         }
     }
 

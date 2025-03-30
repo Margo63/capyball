@@ -76,7 +76,7 @@ class Controller {
                 this.DT = ctrl.getTree(this.controllers, this.number)
                 console.log(this.DT)
             }
-            this.DT.root.processCmd(this.mgr, this.DT.state, cmd)
+            this.DT.dt.root.processCmd(this.mgr, this.DT.state, cmd)
         }
         if (this.debug) console.log(msg, p)
         if (this.debug) console.log("IM HERERE", msg, p)
