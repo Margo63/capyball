@@ -36,8 +36,6 @@ const DT_Goalkeeper = {
             root_exec(state, {act: "gate"})
         },
         next: (input, state) => {
-
-            console.log("PASSER")
             switch (state.action.act) {
                 case PR:
                     return 'checkBallVisibility'

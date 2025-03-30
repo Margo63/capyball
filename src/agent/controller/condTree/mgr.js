@@ -5,7 +5,6 @@ const {distance} = require("../utils/locationUtils");
 class Manager {
 
     constructor(team_name) {
-        //console.log("constructor")
         this.labels = null
         this.agent = null
         this.position = null
@@ -18,14 +17,12 @@ class Manager {
         this.agent = agent
         this.position = position
         this.id = id
-        //console.log("getAction\n"+this.labels)
         const manager = this
 
         function execute(dt, title) {
             let current_title = title
 
             while (current_title !== dt.terminate_command) {
-                //console.log(current_title)
                 const action = dt[current_title]
                 if (typeof action.exec == "function") {
                     action.exec(manager, dt.state)
@@ -46,7 +43,6 @@ class Manager {
         if (this.getVisible(fl)) {
             return this.getP(fl).p[0]
         } else {
-            //console.log(this.agent)
             return distance(this.agent, FLAGS[fl])
         }
     }
@@ -76,23 +72,18 @@ class Manager {
     }
 
     getVisibleTeammates() {
-        //console.log(this.labels.p_labels[0] ? this.labels.p_labels[0].cmd.p : "", this.team_name)
         const teammates = this.labels.p_labels.filter(player => {
-            //console.log(player.cmd.p[1])
             return player.cmd.p[1] === '"' + this.team_name + '"'; // Проверяем название команды
 
         });
-        //console.log(teammates)
         return teammates;
     }
 
     getVisibleTeammate() {
         const teammates = this.labels.p_labels.filter(player => {
-            console.log(player.cmd.p[1])
             return player.cmd.p[1] === '"' + this.team_name + '"'; // Проверяем название команды
 
         });
-        console.log(teammates)
         return teammates.length > 0 ? teammates[0] : null;
     }
 

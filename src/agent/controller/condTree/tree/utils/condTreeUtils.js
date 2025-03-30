@@ -82,7 +82,6 @@ class CondTreeUtils {
         if (CondTreeUtils.getVisible(fl, labels)) {
             return CondTreeUtils.getP(fl, labels).p[0]
         } else {
-            //console.log(CondTreeUtils.agent)
             return distance(agent, FLAGS[fl])
         }
     }
@@ -112,23 +111,18 @@ class CondTreeUtils {
     }
 
     static getVisibleTeammates(labels, team_name) {
-        //console.log(CondTreeUtils.labels.p_labels[0] ? CondTreeUtils.labels.p_labels[0].cmd.p : "", CondTreeUtils.team_name)
         const teammates = labels.p_labels.filter(player => {
-            //console.log(player.cmd.p[1])
             return player.cmd.p[1] === '"' + team_name + '"'; // Проверяем название команды
 
         });
-        //console.log(teammates)
         return teammates;
     }
 
     static getVisibleTeammate(labels, team_name) {
         const teammates = labels.p_labels.filter(player => {
-            console.log(player.cmd.p[1])
             return player.cmd.p[1] === '"' + team_name + '"'; // Проверяем название команды
 
         });
-        console.log(teammates)
         return teammates.length > 0 ? teammates[0] : null;
     }
 
@@ -181,8 +175,6 @@ class CondTreeUtils {
         const teammates = CondTreeUtils.getVisibleTeammates(labels, team_name);
         const ball_label = labels.b_labels[0]
         for (let teammate of teammates) {
-            console.log(teammate)
-            console.log(labels.b_labels)
             const angle = Math.abs(teammate.p[1] - ball_label.p[1])
             const a = Math.abs(teammate.p[0])
             const b = Math.abs(ball_label.p[0])

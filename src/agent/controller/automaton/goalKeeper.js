@@ -78,12 +78,10 @@ const TA = {
             },
             beforeAction(taken, state) {
 // Действие перед каждым вычислением
-                //console.log(taken.goalOwn)
                 if (taken.ball) state.variables.dist = taken.ball.dist
                 else state.variables.dist    =100
                 //else if (taken.goalOwn.dist) state.variables.dist = taken.goalOwn.dist
                 // else {
-                //     console.log()
                 //     return this.goBack(taken, state)
                 // }
 
@@ -125,7 +123,6 @@ const TA = {
                 return {n: "kick", v: "10 45"}
             },
             goBack(taken, state) { // Возврат к воротам
-                console.log(taken.goalOwn)
                 state.next = false
                 let goalOwn = taken.goalOwn
                 if (!goalOwn.dist) return {n: "turn", v: 60}
@@ -163,7 +160,6 @@ const TA = {
                 }
             },
             canIntercept(taken, state) { //МОжем Добежать первыми
-                //console.log("first")
                 let ball = taken.ball
                 let ballPrev = taken.ballPrev
                 state.next = true
@@ -189,7 +185,6 @@ const TA = {
                 return {n: "dash", v: 110}
             },
             ok(taken, state) { // HquPo Делать не надо
-                console.log("ok")
                 state.next = true;
                 return {n: "turn", v: 0}
             },
