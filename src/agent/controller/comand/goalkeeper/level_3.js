@@ -10,7 +10,6 @@ const CTRL_HIGH = {
             let current_title = title
 
             while (current_title !== dt.terminate_command) {
-                //console.log(current_title)
                 const action = dt[current_title]
                 if (typeof action.exec == "function") {
                     action.exec(input, state)

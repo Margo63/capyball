@@ -16,9 +16,6 @@ const CTRL_MIDDLE = {
         return {dt, state}
     },
     execute(input, controllers) {
-        //console.log("ctrl3")
-        //console.log(input)
-        //console.log(input)
         const immediate = this.immediateReaction(input)
         if (immediate) return immediate
         // const defend = this.defendGoal(input)
@@ -33,13 +30,11 @@ const CTRL_MIDDLE = {
         if (input.canKick) {
             let enemy_goal = getEnemyGoal(input.side)
             if (ctu.getVisible(enemy_goal.name, input.see)) {
-                //console.log("kick enemy goal")
                 return {n: "kick", v: 100, a: ctu.getAngle(enemy_goal.name, input.see)}; // Бьем по воротам
             }
 
             let my_goal = getMyGoal(input.side)
             if (ctu.getVisible(my_goal.name, input.see)) {
-                //console.log("kick no goal"+ctu.getAngle(my_goal.name, input.see))
                 return {n: "kick", v: 100, a: 180-ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
             }
             if (ctu.getVisible("ft0", input.see)){
@@ -49,7 +44,6 @@ const CTRL_MIDDLE = {
                 }else{
                     a = -45
                 }
-                //console.log("kick top: "+ ctu.getAngle("ft0", input.see) + " a: "+a)
                 return {n: "kick", v: 100, a: ctu.getAngle("ft0", input.see)+a}
             }
 
@@ -60,7 +54,6 @@ const CTRL_MIDDLE = {
                 }else{
                     a = 45
                 }
-                //console.log("kick bottom")
                 return {n: "kick", v: 100, a: ctu.getAngle("fb0", input.see)+a}
             }
 

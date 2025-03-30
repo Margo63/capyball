@@ -26,7 +26,6 @@ class Controller {
     }
 
     analyze(msg, cmd, p) {
-        // console.log("MSG", msg, "CMD", cmd, "P", p, "ARRAY", p[2].cmd)
         switch (cmd) {
             case "see":
                 this.evaluateSee(p)
@@ -50,7 +49,6 @@ class Controller {
                 //TODO
                 break;
             default:
-            //console.log("cmd not found")
         }
         return this.act
     }
@@ -77,7 +75,6 @@ class Controller {
             }
             this.DT.dt.root.processCmd(this.mgr, this.DT.state, cmd)
         }
-        if (this.debug) console.log(msg, p)
         if (this.debug) console.log("IM HERERE", msg, p)
         Manager_ta.setHear(p)
         switch (p[2]) {

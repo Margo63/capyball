@@ -7,8 +7,6 @@ const CTRL_LOW = {
         }
     },
     execute(input, controllers) {
-        //console.log("ctrl1")
-        //console.log(input)
         const next = controllers[0] //Следующий уровень
         this.taken = Taken.setSee(input) //
         //Выделение объектов
