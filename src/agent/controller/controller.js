@@ -74,7 +74,7 @@ class Controller {
         let processDTCmd = (cmd) => {
             if (!this.DT) {
                 this.DT = ctrl.getTree(this.controllers, this.number)
-                console.log(this.DT)
+               // console.log(this.DT)
             }
             this.DT.dt.root.processCmd(this.mgr, this.DT.state, cmd)
         }

@@ -5,6 +5,11 @@ const ctu = require("./utils/condTreeUtils")
 
 const {FL, KI, CMD, TR, GT, PR, root_exec, handleReachedFlag, refresh_queue} = require("./utils/condTreeUtils");
 
+const ROTATE_ANGLE = 20;
+const DIST_TO_MOVE = 20;
+const BALL_CLOSE_DIST = 2;
+const SLOW_CLOSE_COEFF = 0.8;
+
 const init_commands = [{act: "gate"}, {act: "protect", fl: "b"}]
 const DT_Goalkeeper = {
     terminate_command: "sendCommand",
@@ -74,7 +79,7 @@ const DT_Goalkeeper = {
                 return "findBall"; // Если не виден, поворачиваемся к нему
             } else if (ctu.getDistance(ball, input.see) < 1) {
                 return "kickBall"; // Если рядом, пытаемся отбить// TODO ловим?
-            } else if (ctu.getDistance(ball, input.see) < 15 && !is_last_kick(state)) {
+            } else if (ctu.getDistance(ball, input.see) < DIST_TO_MOVE && !is_last_kick(state)) {
                 return "moveToBall"; // Если мяч достаточно близко, бежим к нему
             }
             return "turnToBall"; // Иначе продолжаем следить за мячом
@@ -89,12 +94,12 @@ const DT_Goalkeeper = {
                 return "findBall"; // Если не виден, поворачиваемся к нему
             } else if (ctu.getDistance(ball, input.see, input.agent) < 1) {
                 return "kickBall"; // Если рядом, пытаемся отбить// TODO ловим?
-            } else if (ctu.getDistance(ball, input.see, input.agent) < 15 && !is_last_kick(state)) {
+            } else if (ctu.getDistance(ball, input.see, input.agent) < DIST_TO_MOVE && !is_last_kick(state)) {
                 return "moveToBall"; // Если мяч достаточно близко, бежим к нему
             }
             state.commands_queue.enqueueFront({act: "gate"})
             const distanceToGoal = ctu.getDistance(getMyGoal(input.side).name, input.see, input.agent);
-            if (ctu.getDistance(ball, input.see) < 20 || distanceToGoal < 5) {
+            if (ctu.getDistance(ball, input.see) < DIST_TO_MOVE || distanceToGoal < 5) {
                 return "checkPosition" // Иначе продолжаем следить за мячом
             } else return "findGoal";
             // } else {
@@ -104,7 +109,7 @@ const DT_Goalkeeper = {
     },
     findBall: {
         exec(input, state) {
-            state.command = {n: "turn", v: 30} // TODO: более умное что-то
+            state.command = {n: "turn", v: ROTATE_ANGLE} // TODO: более умное что-то
         }, next: (input, state) => "sendCommand"
     },
     turnToBall: {
@@ -115,7 +120,12 @@ const DT_Goalkeeper = {
     moveToBall: {
         exec(input, state) {
             let {v, angle} = ctu.hardGoToObject(ball, input.see)
-            state.command = {n: "dash", v: v, a: angle};
+            if (ctu.getDistance(ball, input.see) < BALL_CLOSE_DIST) {
+                state.command = {n: "dash", v: v * SLOW_CLOSE_COEFF, a: angle};
+            } else {
+                state.command = {n: "dash", v: v, a: angle};
+            }
+
         },
         next: (input, state) => "sendCommand"
     },
@@ -130,7 +140,7 @@ const DT_Goalkeeper = {
     },
     rotateToFindGoal: {
         exec(input, state) {
-            state.command = {n: "turn", v: 30}; // Поворачиваемся на 30 градусов
+            state.command = {n: "turn", v: ROTATE_ANGLE}; // Поворачиваемся на 30 градусов
         }, next: (input, state) => "sendCommand"
     },
     moveToGoal: {

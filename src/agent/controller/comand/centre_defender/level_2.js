@@ -12,20 +12,20 @@ const CTRL_MIDDLE = {
         }
         switch (number) {
             case 1:
-                state.init_commands = [{act: "flag", fl: "fp?c"}, {act: "kick", fl: ball}]
-                state.start_coords = "-25 -10"
+                state.init_commands = [{act: "flag", fl: "fct"}, {act: "kick", fl: ball}]
+                state.start_flag = "fct"
                 return {dt, state}
             case 2:
-                state.init_commands = [{act: "flag", fl: "fp?t"}, {act: "kick", fl: ball}]
-                state.start_coords = "-25 0"
+                state.init_commands = [{act: "flag", fl: "fc"}, {act: "kick", fl: ball}]
+                state.start_flag = "fc"
                 return {dt, state}
             case 3:
-                state.init_commands = [{act: "flag", fl: "fp?b"}, {act: "kick", fl: ball}]
-                state.start_coords = "-25 10"
+                state.init_commands = [{act: "flag", fl: "fcb"}, {act: "kick", fl: ball}]
+                state.start_flag = "fcb"
                 return {dt, state}
             default:
-                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                state.start_coords = "25 10"
+                state.init_commands = [{act: "flag", fl: "fc"}, {act: "kick", fl: ball}]
+                state.start_flag = "fc"
                 return {dt, state}
         }
 

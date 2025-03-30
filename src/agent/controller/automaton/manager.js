@@ -41,7 +41,7 @@ const Manager = {
     nextState(taken, ta) { // Находимся в узле, нужен переход
 
         let node = ta.nodes[ta.current]
-        console.log(ta.current)
+        //console.log(ta.current)
         for (let name of node.e) { // Перебираем ребра
             let edgeName = `${node.n}_${name}`
             let edge = ta.edges[edgeName]
@@ -111,7 +111,7 @@ const Manager = {
             if (e.assign) { // Есть назначения в ребре
                 for (let a of e.assign) {
                     if (a.type === "timer") { // ДЛя таймеров
-                        console.log(ta.state)
+                        //console.log(ta.state)
 
                         // if (!ta.state.timers[a.n]){
                         //     console.log(a)

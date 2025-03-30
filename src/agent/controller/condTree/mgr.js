@@ -88,11 +88,11 @@ class Manager {
 
     getVisibleTeammate() {
         const teammates = this.labels.p_labels.filter(player => {
-            console.log(player.cmd.p[1])
+            //console.log(player.cmd.p[1])
             return player.cmd.p[1] === '"' + this.team_name + '"'; // Проверяем название команды
 
         });
-        console.log(teammates)
+        //console.log(teammates)
         return teammates.length > 0 ? teammates[0] : null;
     }
 

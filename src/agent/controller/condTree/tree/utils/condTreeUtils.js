@@ -193,6 +193,24 @@ class CondTreeUtils {
         return true
     }
 
+    static amINeedToKick(labels, team_name) {
+        if (!labels.b_labels || labels.b_labels.length === 0) {
+            return false
+        }
+        const teammates = CondTreeUtils.getVisibleTeammates(labels, team_name);
+        const ball_label = labels.b_labels[0]
+        let closer_amount = 0
+        for (let teammate of teammates) {
+            const angle = Math.abs(teammate.p[1] - ball_label.p[1])
+            const a = Math.abs(teammate.p[0])
+            const b = Math.abs(ball_label.p[0])
+            if (b > getThirdSide(a, b, angle)) {
+                closer_amount++
+            }
+        }
+        return closer_amount < 3
+    }
+
 }
 
 module.exports = CondTreeUtils
