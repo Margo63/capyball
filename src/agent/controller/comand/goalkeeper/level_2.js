@@ -8,8 +8,9 @@ const CTRL_MIDDLE = {
     getTree(controllers, number) {
 
         let dt = DT_GOALKEEPER
-        dt.state.start_coords = "-25 -10"
-        return dt
+        let state
+        state.start_coords = "-25 -10"
+        return {dt, state}
     },
     execute(input, controllers) {
         //console.log("ctrl3")

@@ -179,7 +179,8 @@ class Controller {
                 angleGrad: this.angle.grad,
             },
             start_coords: this.start_coords,
-            dt: this.DT,
+            dt: this.DT.dt,
+            state: this.DT.state,
             team: this.team_name,
             number: this.number
         }

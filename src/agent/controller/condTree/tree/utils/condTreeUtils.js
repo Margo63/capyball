@@ -10,6 +10,7 @@ class CondTreeUtils {
     static CMD = "cmd" // {act: 'cmd', cmd: {n: "turn", v: angle}}
     static TR = "tree" // {act: 'tree', to: "refresh"}
     static GT = "gate" // {act: "gate"}
+    static ST = "start" // {act: "start"}
     static PR = "protect" // {act: "protect", fl: "b"}
     static TM = "teammate" // {act: "teammate"}
     static root_exec(state, default_action) {
@@ -56,13 +57,26 @@ class CondTreeUtils {
             const newCommand = {...command}; // Создаём копию объекта
             for (const key in newCommand) {
                 if (typeof newCommand[key] === 'string') {
-                    newCommand[key] = newCommand[key].replace(/\?/g, side); // Заменяем все '?' на replacementChar
-                    newCommand[key] = newCommand[key].replace(/\*/g, getReverseSide(side)); // Заменяем все '*' на !replacementChar
+                    CondTreeUtils.replaceQuestionMark(newCommand[key], side)
                 }
             }
             return newCommand;
         });
     }
+
+
+    static getFlag(flag, side = 'r') {
+        let result_flag = CondTreeUtils.replaceQuestionMark(flag, side)
+
+        return {name: result_flag, coords: FLAGS[result_flag]}
+    }
+
+    static replaceQuestionMark(command, side = 'r') {
+        command = command.replace(/\?/g, side); // Заменяем все '?' на replacementChar
+        command = command.replace(/\*/g, getReverseSide(side)); // Заменяем все '*' на !replacementChar
+        return command
+    }
+
 
     static getDistance(fl, labels, agent) {
         if (CondTreeUtils.getVisible(fl, labels)) {

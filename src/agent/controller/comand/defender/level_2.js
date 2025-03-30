@@ -6,33 +6,29 @@ const DT_DEFENDER = require('../../condTree/tree/defenderCondTree');
 
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
-        let dt
+        let dt = DT_DEFENDER
+        let state
         switch (number) {
             case 4:
-                dt = DT_DEFENDER
-                dt.state.init_commands = [{act: "flag", fl: "fp*t"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "25 -10"
-                return dt
+                state.init_commands = [{act: "flag", fl: "fp*t"}, {act: "kick", fl: ball}]
+                state.start_coords = "25 -10"
+                return {dt, state}
             case 5:
-                dt = DT_DEFENDER
-                dt.state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "25 10"
-                return dt
+                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
+                state.start_coords = "25 10"
+                return {dt, state}
             case 6:
-                dt = DT_DEFENDER
-                dt.state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "25 10"
-                return dt
+                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
+                state.start_coords = "25 10"
+                return {dt, state}
             case 7:
-                dt = DT_DEFENDER
-                dt.state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "25 10"
-                return dt
+                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
+                state.start_coords = "25 10"
+                return {dt, state}
             default:
-                dt = DT_DEFENDER
-                dt.state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "25 10"
-                return dt
+                state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
+                state.start_coords = "25 10"
+                return {dt, state}
 
         }
 

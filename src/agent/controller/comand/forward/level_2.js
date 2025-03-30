@@ -2,33 +2,30 @@ const {getEnemyGoal, getMyGoal, ball} = require("../../utils/constants");
 const ctu = require("../../condTree/tree/utils/condTreeUtils");
 const DEF_ROTATE_ANGLE = 30
 const DEF_BALLSEEK_ANGLE = 30
-const DT_PASSER = require('../../condTree/tree/passerCondTree');
 const DT_FORWARD = require('../../condTree/tree/forwardCondTree');
 
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
-        let dt
+        let dt = DT_FORWARD
+        let state
         switch (number) {
             case 8:
-                dt = DT_FORWARD
-                dt.state.init_commands = [{act: "flag", fl: "fp?c"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "-25 -10"
-                return dt
+
+                state.init_commands = [{act: "flag", fl: "fp*t"}, {act: "kick", fl: ball}]
+                state.start_flag = "fp*t"
+                return {dt, state}
             case 9:
-                dt = DT_FORWARD
-                dt.state.init_commands = [{act: "flag", fl: "fp?t"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "-25 0"
-                return dt
+                dt.state.init_commands = [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}]
+                dt.state.start_flag = "fp*c"
+                return {dt, state}
             case 10:
-                dt = DT_FORWARD
-                dt.state.init_commands = [{act: "flag", fl: "fp?b"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "-25 10"
-                return dt
-            default:
-                dt = DT_FORWARD
                 dt.state.init_commands = [{act: "flag", fl: "fp*b"}, {act: "kick", fl: ball}]
-                dt.state.start_coords = "25 10"
-                return dt
+                dt.state.start_flag = "fp*b"
+                return {dt, state}
+            default:
+                state.init_commands = [{act: "flag", fl: "fp*c"}, {act: "kick", fl: ball}]
+                state.start_flag = "fp*c"
+                return {dt, state}
         }
 
     },
