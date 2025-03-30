@@ -13,28 +13,28 @@ let teamName = "teamA" // Имя команды
     agent1.socketSend("move", `-20 0`)
 }
 
-//
-// const ctrl1_с = require('../agent/controller/comand/centre_defender/level_1')
-// const ctrl2_с = require('../agent/controller/comand/centre_defender/level_2')
-// const ctrl3_с = require('../agent/controller/comand/centre_defender/level_3')
-// {
-//     let controller8 = new Controller(teamName, [ctrl1_d, ctrl2_d, ctrl3_d], 1);
-//     let agent8 = new Agent(controller8);
-//     require('../serverCommunication/socket')(agent8, teamName, VERSION)
-//     agent8.socketSend("move", `-25 -10`)
-// }
-// {
-//     let controller9 = new Controller(teamName, [ctrl1_d, ctrl2_d, ctrl3_d], 2);
-//     let agent9 = new Agent(controller9);
-//     require('../serverCommunication/socket')(agent9, teamName, VERSION)
-//     agent9.socketSend("move", `-25 -10`)
-// }
-// {
-//     let controller10 = new Controller(teamName, [ctrl1_d, ctrl2_d, ctrl3_d], 3);
-//     let agent10 = new Agent(controller10);
-//     require('../serverCommunication/socket')(agent10, teamName, VERSION)
-//     agent10.socketSend("move", `-25 -10`)
-// }
+
+const ctrl1_c = require('../agent/controller/comand/centre_defender/level_1')
+const ctrl2_c = require('../agent/controller/comand/centre_defender/level_2')
+const ctrl3_c = require('../agent/controller/comand/centre_defender/level_3')
+{
+    let controller8 = new Controller(teamName, [ctrl1_c, ctrl2_c, ctrl3_c], 1);
+    let agent8 = new Agent(controller8);
+    require('../serverCommunication/socket')(agent8, teamName, VERSION)
+    agent8.socketSend("move", `-25 -10`)
+}
+{
+    let controller9 = new Controller(teamName, [ctrl1_c, ctrl2_c, ctrl3_c], 2);
+    let agent9 = new Agent(controller9);
+    require('../serverCommunication/socket')(agent9, teamName, VERSION)
+    agent9.socketSend("move", `-25 -10`)
+}
+{
+    let controller10 = new Controller(teamName, [ctrl1_c, ctrl2_c, ctrl3_c], 3);
+    let agent10 = new Agent(controller10);
+    require('../serverCommunication/socket')(agent10, teamName, VERSION)
+    agent10.socketSend("move", `-25 -10`)
+}
 
 const ctrl1_d = require('../agent/controller/comand/defender/level_1')
 const ctrl2_d = require('../agent/controller/comand/defender/level_2')
