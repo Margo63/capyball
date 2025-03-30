@@ -1,6 +1,6 @@
 const CommandQueue = require("../../commandQueue");
 const {getEnemyGoal, getMyGoal} = require("../../utils/constants");
-const {FL, KI, CMD, TR, root_exec, refresh_queue, handleReachedFlag} = require("./utils/condTreeUtils");
+const {FL, KI, CMD, TR, root_exec, refresh_queue, handleReachedFlag, amITheClosest} = require("./utils/condTreeUtils");
 const {ball} = require("../../utils/constants")
 const ctu = require("./utils/condTreeUtils")
 
@@ -10,6 +10,7 @@ const flag_closeness = 3;
 const ball_closeness = 1;
 const speed = 100;
 const wait_time = 15;
+const slow_coeff = 0.8;
 
 
 const DT = {
@@ -29,8 +30,8 @@ const DT = {
             }
         },
         exec(input, state) {
-            if (input.isEnemySide &&
-                (state.commands_queue.isEmpty() || state.commands_queue.peek().act !== "flag")) {
+            if (input.isEnemySide && !input.amIClosestToBall &&
+            (state.commands_queue.isEmpty() || state.commands_queue.peek().act !== "flag")) {
                 refresh_queue(state, state.init_commands, input.side)
             }
             root_exec(state, {act: "kick", fl: ball})
@@ -92,8 +93,8 @@ const DT = {
                 return "findBall"; // Если не виден, поворачиваемся к нему
             } else if (ctu.getDistance(ball, input.see, input.agent) < 1) {
                 return "kickBall"; // Если рядом, пытаемся отбить// TODO ловим?
-            } else if (ctu.getDistance(ball, input.see, input.agent) < 20 && !is_last_kick(state)) {
-                return "moveToBall"; // Если мяч достаточно близко, бежим к нему
+            } else if ((ctu.getDistance(ball, input.see, input.agent) < 20 || input.amIClosestToBall) && !is_last_kick(state)) {
+                return "moveToBall"; // Если мяч достаточно близко или ближе нас никого, бежим к нему
             }
             state.commands_queue.enqueueFront({act: "flag", fl: "fp?c"})
             const distanceToGoal = ctu.getDistance(state.start.name, input.see, input.agent);
@@ -118,7 +119,11 @@ const DT = {
     moveToBall: {
         exec(input, state) {
             let {v, angle} = ctu.hardGoToObject(ball, input.see)
-            state.command = {n: "dash", v: v, a: angle};
+            if (input.amIClosestToBall) {
+                state.command = {n: "dash", v: v, a: angle};
+            } else {
+                state.command = {n: "dash", v: v * slow_coeff, a: angle};
+            }
         },
         next: (input, state) => "sendCommand"
     },

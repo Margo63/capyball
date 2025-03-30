@@ -30,6 +30,24 @@ class MathUtils {
     static distance(a, b) {
         return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
     }
+
+    /**
+     * Вычисляет третью сторону треугольника по двум сторонам и углу между ними
+     * @param {number} a - Длина первой стороны
+     * @param {number} b - Длина второй стороны
+     * @param {number} angle - Угол между сторонами a и b (в градусах)
+     * @returns {number} Длина третьей стороны
+     */
+    sta
+
+    static getThirdSide(a, b, angle) {
+        let angleInRadians = MathUtils.toRadians(angle)
+        return Math.sqrt(
+            Math.pow(a, 2) +
+            Math.pow(b, 2) -
+            2 * a * b * Math.cos(angleInRadians)
+        );
+    }
 }
 
 module.exports = MathUtils

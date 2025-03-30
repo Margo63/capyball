@@ -20,7 +20,7 @@ const flag_closeness = 3;
 const ball_closeness = 1;
 const speed = 100;
 const slowDownDistance = 3;
-const slow_down_coefficient = 0.6;
+const slow_coeff = 0.8;
 
 const DT = {
     terminate_command: "sendCommand",
@@ -102,7 +102,7 @@ const DT = {
                 return "findBall"; // Если не виден, поворачиваемся к нему
             } else if (ctu.getDistance(ball, input.see, input.agent) < 1) {
                 return "kickBall"; // Если рядом, пытаемся отбить// TODO ловим?
-            } else if (ctu.getDistance(ball, input.see, input.agent) < 20 && !is_last_kick(state)) {
+            } else if ((ctu.getDistance(ball, input.see, input.agent) < 20 || input.amIClosestToBall) && !is_last_kick(state)) {
                 return "moveToBall"; // Если мяч достаточно близко, бежим к нему
             }
             state.commands_queue.enqueueFront({act: "flag", fl: "fp?c"})
@@ -128,7 +128,11 @@ const DT = {
     moveToBall: {
         exec(input, state) {
             let {v, angle} = ctu.hardGoToObject(ball, input.see)
-            state.command = {n: "dash", v: v, a: angle};
+            if (input.amIClosestToBall) {
+                state.command = {n: "dash", v: v, a: angle};
+            } else {
+                state.command = {n: "dash", v: v * slow_coeff, a: angle};
+            }
         },
         next: (input, state) => "sendCommand"
     },

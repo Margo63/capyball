@@ -1,6 +1,7 @@
 const {getEnemyGoal, FLAGS, getReverseSide} = require("../../../utils/constants");
 const CommandQueue = require("../../../commandQueue");
 const {getTurnAngle, isGoal} = require("../../../utils/actUtils");
+const {getThirdSide} = require("../../../utils/mathUtils");
 const {distance} = require("../../../utils/locationUtils");
 
 class CondTreeUtils {
@@ -170,6 +171,26 @@ class CondTreeUtils {
 
     static getIndex(fl, labels) {
         return labels.all_labels_name.indexOf(fl)
+    }
+
+    static amITheClosest(labels, team_name) {
+        if (!labels.b_labels || labels.b_labels.length === 0) {
+            return true
+        }
+
+        const teammates = CondTreeUtils.getVisibleTeammates(labels, team_name);
+        const ball_label = labels.b_labels[0]
+        for (let teammate of teammates) {
+            console.log(teammate)
+            console.log(labels.b_labels)
+            const angle = Math.abs(teammate.p[1] - ball_label.p[1])
+            const a = Math.abs(teammate.p[0])
+            const b = Math.abs(ball_label.p[0])
+            if (b <= getThirdSide(a, b, angle)) {
+                return false
+            }
+        }
+        return true
     }
 
 }
