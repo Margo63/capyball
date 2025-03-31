@@ -46,31 +46,57 @@ const CTRL_MIDDLE = {
     immediateReaction(input) { // Немедленная реакция
         if (input.canKick) {
             let enemy_goal = getEnemyGoal(input.side)
-
             if (ctu.getVisible(enemy_goal.name, input.see)) {
                 return {n: "kick", v: 100, a: ctu.getAngle(enemy_goal.name, input.see)}; // Бьем по воротам
             }
             let my_goal = getMyGoal(input.side)
             if (ctu.getVisible(my_goal.name, input.see)) {
-                return {n: "kick", v: 100, a: 180-ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
+                return {n: "kick", v: 100, a: 180 - ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
             }
 
-            if (ctu.getVisible("ft0", input.see)){
-                if(isMySide(input.agent, input.side)){
+            if (ctu.getVisible("ft0", input.see)) {
+                if (isMySide(input.agent, input.side)) {
                     let a
-                    if(input.side == "l"){
-                        a = 1
-                    }else{
-                        a = -1
+                    if (input.side == "l") {
+                        a = 45
+                    } else {
+                        a = -45
                     }
-                    return {n: "kick", v: 10, a: 180+ a*ctu.getAngle("ft0", input.see)}
+                    return {n: "kick", v: 100, a: ctu.getAngle("ft0", input.see) + a}
+
                 }
 
-                return {n: "kick", v: 100, a: ctu.getAngle("ft0", input.see)}
+                let a
+                if (input.side == "l") {
+                    a = 1
+                } else {
+                    a = -1
+                }
+                return {n: "kick", v: 10, a: 180 + a * ctu.getAngle("ft0", input.see)}
             }
 
-            if (ctu.getVisible("fb0", input.see))
-                return {n: "kick", v: 100, a: ctu.getAngle("fb0", input.see)}
+            if (ctu.getVisible("fb0", input.see)) {
+                if (isMySide(input.agent, input.side)) {
+
+                    let a
+                    if(input.side == "l"){
+                        a = -45
+                    }else{
+                        a = 45
+                    }
+                    return {n: "kick", v: 100, a: ctu.getAngle("fb0", input.see)+a}
+                }
+
+                let a
+                if (input.side == "l") {
+                    a = -1
+                } else {
+                    a = 1
+                }
+                return {n: "kick", v: 10, a: 180 + a * ctu.getAngle("fb0", input.see)}
+
+            }
+
             if (ctu.getVisible("fg" + input.side + 't', input.see))
                 return {n: "kick", v: 100, a: -180}
             if (ctu.getVisible("fg" + input.side + 'b', input.see))

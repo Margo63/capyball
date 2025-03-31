@@ -1,7 +1,5 @@
 const {getEnemyGoal, getMyGoal, ball} = require("../../utils/constants");
 const ctu = require("../../condTree/tree/utils/condTreeUtils");
-const DEF_ROTATE_ANGLE = 30
-const DEF_BALLSEEK_ANGLE = 30
 const DT_DEFENDER = require('../../condTree/tree/defenderCondTree');
 const CommandQueue = require("../../commandQueue");
 

@@ -52,7 +52,7 @@ const DT = {
                     if (state.action.to === "refresh") {
                         console.log("----------------- refresh --------------------")
                         refresh_queue(state, state.init_commands, input.side)
-                        state.command = {n: "move", v: state.start_coords};
+                        state.command = {n: "move", v: `${state.start.coords.x} ${state.start.coords.y}`};
                         state.wait = 0;
                         return 'sendCommand'
                     }
