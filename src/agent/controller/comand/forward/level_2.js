@@ -1,7 +1,5 @@
 const {getEnemyGoal, getMyGoal, ball} = require("../../utils/constants");
 const ctu = require("../../condTree/tree/utils/condTreeUtils");
-const DEF_ROTATE_ANGLE = 30
-const DEF_BALLSEEK_ANGLE = 30
 const DT_FORWARD = require('../../condTree/tree/forwardCondTree');
 const CommandQueue = require("../../commandQueue");
 
@@ -55,7 +53,7 @@ const CTRL_MIDDLE = {
             }
 
             if (ctu.getVisible("ft0", input.see)){
-                console.log("see ft0 " +ctu.getAngle("ft0", input.see))
+                //console.log("see ft0 " +ctu.getAngle("ft0", input.see))
                 let a
                 if(input.side == "l"){
                     a = 1
@@ -66,7 +64,7 @@ const CTRL_MIDDLE = {
             }
 
             if (ctu.getVisible("fb0", input.see)){
-                console.log("see fb0 "+ctu.getAngle("fb0", input.see))
+                //console.log("see fb0 "+ctu.getAngle("fb0", input.see))
                 let a
                 if(input.side == "l"){
                     a = -1
@@ -77,22 +75,22 @@ const CTRL_MIDDLE = {
             }
             let my_goal = getMyGoal(input.side)
             if (ctu.getVisible(my_goal.name, input.see)) {
-                console.log("not fgoal")
+                //console.log("not fgoal")
                 return {n: "kick", v: 10, a: 180-ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
             }
 
 
             if (ctu.getVisible("fg" + input.side + 't', input.see)){
-                console.log("see my goal "+"fg" + input.side + 't')
+                //console.log("see my goal "+"fg" + input.side + 't')
                 return {n: "kick", v: 100, a: -180}
             }
 
             if (ctu.getVisible("fg" + input.side + 'b', input.see)){
-                console.log("see my goal "+"fg" + input.side + 'b')
+                //console.log("see my goal "+"fg" + input.side + 'b')
                 return {n: "kick", v: 100, a: -180}
             }
 
-            console.log("nothing see")
+            //console.log("nothing see")
             return {n: "kick", v: 10, a: 90}; // Отбиваем мяч
         }
     },
