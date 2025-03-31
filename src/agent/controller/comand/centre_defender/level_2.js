@@ -3,7 +3,7 @@ const ctu = require("../../condTree/tree/utils/condTreeUtils");
 const DT_CENTER_DEFENDER = require('../../condTree/tree/centerDefenderCondTree');
 const DT_SCORING = require('../../condTree/tree/forwardCondTree');
 const CommandQueue = require("../../commandQueue");
-
+const isMySide = require('../../utils/locationUtils')
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
         let dt = DT_CENTER_DEFENDER
@@ -46,15 +46,29 @@ const CTRL_MIDDLE = {
     immediateReaction(input) { // Немедленная реакция
         if (input.canKick) {
             let enemy_goal = getEnemyGoal(input.side)
+
             if (ctu.getVisible(enemy_goal.name, input.see)) {
                 return {n: "kick", v: 100, a: ctu.getAngle(enemy_goal.name, input.see)}; // Бьем по воротам
             }
             let my_goal = getMyGoal(input.side)
             if (ctu.getVisible(my_goal.name, input.see)) {
-                return {n: "kick", v: 100, a: -ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
+                return {n: "kick", v: 100, a: 180-ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
             }
-            if (ctu.getVisible("ft0", input.see))
+
+            if (ctu.getVisible("ft0", input.see)){
+                if(isMySide(input.agent, input.side)){
+                    let a
+                    if(input.side == "l"){
+                        a = 1
+                    }else{
+                        a = -1
+                    }
+                    return {n: "kick", v: 10, a: 180+ a*ctu.getAngle("ft0", input.see)}
+                }
+
                 return {n: "kick", v: 100, a: ctu.getAngle("ft0", input.see)}
+            }
+
             if (ctu.getVisible("fb0", input.see))
                 return {n: "kick", v: 100, a: ctu.getAngle("fb0", input.see)}
             if (ctu.getVisible("fg" + input.side + 't', input.see))
