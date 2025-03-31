@@ -35,6 +35,7 @@ const CTRL_MIDDLE = {
 
             let my_goal = getMyGoal(input.side)
             if (ctu.getVisible(my_goal.name, input.see)) {
+                input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: 180 - ctu.getAngle(my_goal.name, input.see)}})
                 return {n: "kick", v: 100, a: 180-ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
             }
             if (ctu.getVisible("ft0", input.see)){

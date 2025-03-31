@@ -92,7 +92,7 @@ class CondTreeUtils {
 
     static hardGoToObject(fl, labels, agent) {
         let angle
-        let v = 100
+        let v = 80
         if (CondTreeUtils.getVisible(fl, labels)) {
             angle = CondTreeUtils.getAngle(fl, labels)
         } else {

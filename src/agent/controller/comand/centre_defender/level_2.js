@@ -3,7 +3,7 @@ const ctu = require("../../condTree/tree/utils/condTreeUtils");
 const DT_CENTER_DEFENDER = require('../../condTree/tree/centerDefenderCondTree');
 const DT_SCORING = require('../../condTree/tree/forwardCondTree');
 const CommandQueue = require("../../commandQueue");
-const isMySide = require('../../utils/locationUtils')
+const {isMySide} = require('../../utils/locationUtils')
 const CTRL_MIDDLE = {
     getTree(controllers, number) {
         let dt = DT_CENTER_DEFENDER
@@ -51,7 +51,9 @@ const CTRL_MIDDLE = {
             }
             let my_goal = getMyGoal(input.side)
             if (ctu.getVisible(my_goal.name, input.see)) {
-                return {n: "kick", v: 100, a: 180 - ctu.getAngle(my_goal.name, input.see)}; // Бьем НЕ по воротам
+                let a = 180 - ctu.getAngle(my_goal.name, input.see)
+                input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: a}})
+                return {n: "kick", v: 30, a: a}; // Бьем НЕ по воротам
             }
 
             if (ctu.getVisible("ft0", input.see)) {
@@ -62,7 +64,10 @@ const CTRL_MIDDLE = {
                     } else {
                         a = -45
                     }
-                    return {n: "kick", v: 100, a: ctu.getAngle("ft0", input.see) + a}
+                    let angle = ctu.getAngle("ft0", input.see)+a
+                    if(angle > 30)
+                        input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: angle}})
+                    return {n: "kick", v: 30, a: ctu.getAngle("ft0", angle)}
 
                 }
 
@@ -72,7 +77,12 @@ const CTRL_MIDDLE = {
                 } else {
                     a = -1
                 }
-                return {n: "kick", v: 10, a: 180 + a * ctu.getAngle("ft0", input.see)}
+                let angle = 180 + a * ctu.getAngle("ft0", input.see)
+                if(angle > 30)
+                    input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: angle}})
+
+                //input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: 180 - ctu.getAngle(my_goal.name, input.see)}})
+                return {n: "kick", v: 10, a: angle}
             }
 
             if (ctu.getVisible("fb0", input.see)) {
@@ -84,7 +94,10 @@ const CTRL_MIDDLE = {
                     }else{
                         a = 45
                     }
-                    return {n: "kick", v: 100, a: ctu.getAngle("fb0", input.see)+a}
+                    let angle = ctu.getAngle("fb0", input.see)+a
+                    if(angle > 30)
+                        input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: angle}})
+                    return {n: "kick", v: 30, a: angle}
                 }
 
                 let a
@@ -93,7 +106,11 @@ const CTRL_MIDDLE = {
                 } else {
                     a = 1
                 }
-                return {n: "kick", v: 10, a: 180 + a * ctu.getAngle("fb0", input.see)}
+                let angle = 180 + a * ctu.getAngle("fb0", input.see)
+                if(angle > 30)
+                    input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: angle}})
+
+                return {n: "kick", v: 10, a: angle}
 
             }
 

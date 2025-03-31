@@ -60,7 +60,13 @@ const CTRL_MIDDLE = {
                 }else{
                     a = -1
                 }
-                return {n: "kick", v: 10, a: 180+ a*ctu.getAngle("ft0", input.see)}
+                let angle = 180 + a * ctu.getAngle("ft0", input.see)
+                if(angle > 30)
+                    input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: angle}})
+
+                return {n: "kick", v: 10, a: angle}
+
+                //return {n: "kick", v: 10, a: 180+ a*ctu.getAngle("ft0", input.see)}
             }
 
             if (ctu.getVisible("fb0", input.see)){
@@ -71,7 +77,12 @@ const CTRL_MIDDLE = {
                 }else{
                     a = 1
                 }
-                return {n: "kick", v: 10, a: 180+ a*ctu.getAngle("fb0", input.see)}
+                let angle = 180 + a * ctu.getAngle("fb0", input.see)
+                if(angle > 30)
+                    input.state.commands_queue.enqueueFront({act:"cmd", cmd:{n:"turn", v: angle}})
+
+                return {n: "kick", v: 10, a: angle}
+                //return {n: "kick", v: 10, a: 180+ a*ctu.getAngle("fb0", input.see)}
             }
             let my_goal = getMyGoal(input.side)
             if (ctu.getVisible(my_goal.name, input.see)) {

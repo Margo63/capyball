@@ -15,7 +15,7 @@ let teamName = "teamA" // Имя команды
     agent1.socketSend("move", `-50 0`)
 }
 
-
+/*
 const ctrl1_c = require('../agent/controller/comand/centre_defender/level_1')
 const ctrl2_c = require('../agent/controller/comand/centre_defender/level_2')
 const ctrl3_c = require('../agent/controller/comand/centre_defender/level_3')
@@ -89,4 +89,4 @@ const ctrl3_f = require('../agent/controller/comand/forward/level_3')
     let agent3 = new Agent(controller3);
     require('../serverCommunication/socket')(agent3, teamName, VERSION)
     agent3.socketSend("move", `40 10`)
-}
+}*/
